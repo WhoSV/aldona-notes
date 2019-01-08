@@ -1,7 +1,5 @@
 # Aldona Notes App
 
-It's just simple notes app.
-
 ### Quick start
 
 ```bash
