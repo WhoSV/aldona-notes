@@ -181,7 +181,7 @@ export class Database {
     if (this.database !== undefined) {
       return Promise.resolve(this.database);
     }
-    // otherwise: open the database first
+    // Otherwise: open the database first
     return this.open();
   }
 }

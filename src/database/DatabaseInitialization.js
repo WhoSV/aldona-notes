@@ -23,7 +23,7 @@ export class DatabaseInitialization {
           // Uncomment the next line, and the referenced function below, to enable this
           // return database.transaction(this.preVersion1Inserts);
         }
-        // otherwise,
+        // Otherwise,
         return;
       })
       .then(() => {
@@ -31,7 +31,7 @@ export class DatabaseInitialization {
           // Uncomment the next line, and the referenced function below, to enable this
           // return database.transaction(this.preVersion2Inserts);
         }
-        // otherwise,
+        // Otherwise,
         return;
       });
   }

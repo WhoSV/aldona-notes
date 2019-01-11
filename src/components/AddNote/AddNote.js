@@ -1,59 +1,34 @@
 import React from 'react';
-import { View, TextInput, StyleSheet, ScrollView, Keyboard, Dimensions, TouchableOpacity, Text, Share, Image } from 'react-native';
+import { View, TextInput, ScrollView, Keyboard, Dimensions, TouchableOpacity, Text, Share, Image } from 'react-native';
 import { NavigationActions } from 'react-navigation';
 
 // Import database
-import { database } from '../database/Database';
+import { database } from '../../database/Database';
+
+// Import styles
+import style from './style';
 
 // Declare for using func inside navigationOptions
 let _this;
 
-export default class AddNoteScreen extends React.Component {
+export default class AddNoteComponent extends React.Component {
   // Header Component
   static navigationOptions = ({ navigation }) => {
     const { params = {} } = navigation.state;
     return {
-      headerStyle: {
-        borderBottomWidth: 0,
-        height: 50,
-        marginBottom: -20
-      },
+      headerStyle: style.addNoteHeaderStyle,
       headerTintColor: '#18C4E6',
       headerRight: params.action,
       headerLeft: (
         <TouchableOpacity
-          style={{
-            alignItems: 'center',
-            flexDirection: 'row'
-          }}
+          style={style.addNoteHeaderBackButton}
           onPress={() => {
             navigation.dispatch(NavigationActions.back());
             _this.handleAddNote();
           }}
         >
-          <Image
-            source={require('../assets/images/back.png')}
-            fadeDuration={0}
-            style={{
-              width: 13,
-              height: 21,
-              overflow: 'hidden',
-              marginLeft: 9,
-              marginRight: 6,
-              marginVertical: 12,
-              resizeMode: 'contain',
-              tintColor: '#12C4E6'
-            }}
-          />
-          <Text
-            style={{
-              fontSize: 17,
-              paddingRight: 10,
-              color: '#18C4E6'
-            }}
-          >
-            {params.parentFolder.title.length <= 15 ? params.parentFolder.title : 'Back'}
-          </Text>
+          <Image source={require('../../assets/images/back.png')} fadeDuration={0} style={style.addNoteHeaderBackButtonImage} />
+          <Text style={style.addNoteHeaderBackButtonText}>{params.parentFolder.title.length <= 15 ? params.parentFolder.title : 'Back'}</Text>
         </TouchableOpacity>
       )
     };
@@ -93,9 +68,9 @@ export default class AddNoteScreen extends React.Component {
           onPress={() => {
             Keyboard.dismiss();
           }}
-          style={{ marginRight: 15 }}
+          style={style.actionButtons}
         >
-          <Text style={{ color: '#18C4E6', fontSize: 18 }}>Done</Text>
+          <Text style={style.doneButtonText}>Done</Text>
         </TouchableOpacity>
       )
     });
@@ -113,16 +88,9 @@ export default class AddNoteScreen extends React.Component {
               message: this.state.text
             })
           }
-          style={{ marginRight: 15 }}
+          style={style.actionButtons}
         >
-          <Image
-            style={{
-              width: 25,
-              height: 25,
-              tintColor: '#18C4E6'
-            }}
-            source={require('../assets/images/share-icon.png')}
-          />
+          <Image style={style.editButtonText} source={require('../../assets/images/share.png')} />
         </TouchableOpacity>
       )
     });
@@ -142,7 +110,7 @@ export default class AddNoteScreen extends React.Component {
 
   render() {
     return (
-      <View style={styles.textAreaContainer}>
+      <View style={style.addNoteContainer}>
         <ScrollView keyboardDismissMode="interactive">
           <TextInput
             onChangeText={text => this.setState({ text })}
@@ -161,12 +129,3 @@ export default class AddNoteScreen extends React.Component {
     );
   }
 }
-
-const styles = StyleSheet.create({
-  textAreaContainer: {
-    flex: 1,
-    paddingTop: 15,
-    paddingLeft: 15,
-    backgroundColor: '#fff'
-  }
-});

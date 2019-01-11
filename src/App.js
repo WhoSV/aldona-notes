@@ -6,17 +6,17 @@ import { createStackNavigator } from 'react-navigation';
 // Import database
 import { database } from './database/Database';
 
-// Import Screens
-import FoldersScreen from './screens/FoldersScreen';
-import NotesScreen from './screens/NotesScreen';
-import AddNoteScreen from './screens/AddNoteScreen';
-import EditNoteScreen from './screens/EditNoteScreen';
+// Import Components
+import FolderComponent from './components/Folder/Folder';
+import NoteComponent from './components/Note/Note';
+import AddNoteComponent from './components/AddNote/AddNote';
+import EditNoteComponent from './components/EditNote/EditNote';
 
 const AppNavigator = createStackNavigator({
-  FoldersScreen: { screen: FoldersScreen },
-  NotesScreen: { screen: NotesScreen },
-  AddNoteScreen: { screen: AddNoteScreen },
-  EditNoteScreen: { screen: EditNoteScreen }
+  FolderComponent: { screen: FolderComponent },
+  NoteComponent: { screen: NoteComponent },
+  AddNoteComponent: { screen: AddNoteComponent },
+  EditNoteComponent: { screen: EditNoteComponent }
 });
 
 export default class App extends React.Component {
@@ -30,7 +30,7 @@ export default class App extends React.Component {
   }
 
   componentDidMount() {
-    // hide splash screen
+    // Hide splash screen
     SplashScreen.hide();
 
     // App is starting up

@@ -1,25 +1,20 @@
 import React from 'react';
-import { View, Text, AlertIOS, TouchableHighlight, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, Text, AlertIOS, TouchableHighlight, TouchableOpacity, Image } from 'react-native';
 import { SwipeListView } from 'react-native-swipe-list-view';
 
 // Import database
-import { database } from '../database/Database';
+import { database } from '../../database/Database';
 
-export default class FoldersScreen extends React.Component {
+// Import styles
+import style from './style';
+
+export default class FolderComponent extends React.Component {
   // Header Component
   static navigationOptions = {
     title: 'Folders',
-    headerStyle: {
-      borderBottomWidth: 0,
-      height: 50,
-      marginBottom: -20
-    },
+    headerStyle: style.folderHeaderStyle,
     headerTintColor: '#18C4E6',
-    headerTitleStyle: {
-      fontWeight: '300',
-      fontSize: 25,
-      color: '#18C4E6'
-    }
+    headerTitleStyle: style.folderHeaderTitleStyle
   };
 
   constructor(props) {
@@ -123,7 +118,7 @@ export default class FoldersScreen extends React.Component {
 
   render() {
     return (
-      <View style={style.mainView}>
+      <View style={style.folderContainer}>
         {/* Flat List View */}
         <SwipeListView
           useFlatList={true}
@@ -132,7 +127,7 @@ export default class FoldersScreen extends React.Component {
           renderItem={rowData => (
             <TouchableHighlight
               onPress={() =>
-                this.props.navigation.navigate('NotesScreen', {
+                this.props.navigation.navigate('NoteComponent', {
                   parentFolder: rowData.item
                 })
               }
@@ -147,13 +142,7 @@ export default class FoldersScreen extends React.Component {
                   <Text style={style.rowSubtitle}>{rowData.item.updated_at}</Text>
                 </View>
                 <View style={style.rowIcon}>
-                  <Image
-                    style={{
-                      width: 18,
-                      height: 18
-                    }}
-                    source={require('../assets/images/forward.png')}
-                  />
+                  <Image style={style.rowIconImage} source={require('../../assets/images/forward.png')} />
                 </View>
               </View>
             </TouchableHighlight>
@@ -164,25 +153,13 @@ export default class FoldersScreen extends React.Component {
                 style={[style.backRightBtn, style.backRightBtnLeft]}
                 onPress={_ => this.handleUpdateFolder(rowData.item, rowData.item.id, rowMap)}
               >
-                <Image
-                  style={{
-                    width: 25,
-                    height: 25
-                  }}
-                  source={require('../assets/images/edit-icon.png')}
-                />
+                <Image style={style.backEditIcon} source={require('../../assets/images/edit.png')} />
               </TouchableOpacity>
               <TouchableOpacity
                 style={[style.backRightBtn, style.backRightBtnRight]}
                 onPress={_ => this.handleDeleteFolder(rowData.item, rowData.item.id, rowMap)}
               >
-                <Image
-                  style={{
-                    width: 30,
-                    height: 30
-                  }}
-                  source={require('../assets/images/delete-icon.png')}
-                />
+                <Image style={style.backDeleteIcon} source={require('../../assets/images/delete.png')} />
               </TouchableOpacity>
             </View>
           )}
@@ -221,84 +198,3 @@ export default class FoldersScreen extends React.Component {
     );
   }
 }
-
-const style = StyleSheet.create({
-  mainView: {
-    backgroundColor: 'white',
-    flex: 1
-  },
-  container: {
-    marginTop: 20,
-    borderTopWidth: 0,
-    backgroundColor: '#fff'
-  },
-  row: {
-    backgroundColor: '#ffffff',
-    paddingBottom: 10,
-    paddingTop: 10,
-    paddingLeft: 20,
-    paddingRight: 7,
-    borderBottomColor: '#ECECED',
-    borderBottomWidth: 1
-  },
-  rowContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap'
-  },
-  rowView: {
-    width: '92%'
-  },
-  rowTitle: {
-    color: '#4A4A4A',
-    marginRight: 10,
-    paddingBottom: 3,
-    fontSize: 19
-  },
-  rowSubtitle: {
-    fontWeight: '300',
-    color: '#ccc',
-    fontSize: 14
-  },
-  rowIcon: {
-    justifyContent: 'center'
-  },
-  rowBack: {
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingLeft: 15
-  },
-  backRightBtn: {
-    alignItems: 'center',
-    bottom: 0,
-    justifyContent: 'center',
-    position: 'absolute',
-    top: 0,
-    width: 75
-  },
-  backRightBtnLeft: {
-    backgroundColor: '#007aff',
-    right: 75
-  },
-  backRightBtnRight: {
-    backgroundColor: '#ff3b30',
-    right: 0
-  },
-  addFolderButtonView: {
-    height: '8%'
-  },
-  addFolderButton: {
-    alignSelf: 'flex-end',
-    paddingTop: 13,
-    paddingBottom: 10,
-    paddingLeft: 10,
-    paddingRight: 13
-  },
-  addFolderButtonText: {
-    color: '#18C4E6',
-    fontWeight: '400',
-    fontSize: 20
-  }
-});

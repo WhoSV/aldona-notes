@@ -1,19 +1,18 @@
 import React from 'react';
-import { View, TextInput, StyleSheet, ScrollView, Keyboard, Dimensions, TouchableOpacity, Text, Share, Image } from 'react-native';
+import { View, TextInput, ScrollView, Keyboard, Dimensions, TouchableOpacity, Text, Share, Image } from 'react-native';
 
 // Import database
-import { database } from '../database/Database';
+import { database } from '../../database/Database';
 
-export default class EditNoteScreen extends React.Component {
+// Import styles
+import style from './style';
+
+export default class EditNoteComponent extends React.Component {
   // Header Component
   static navigationOptions = ({ navigation }) => {
     const { params = {} } = navigation.state;
     return {
-      headerStyle: {
-        borderBottomWidth: 0,
-        height: 50,
-        marginBottom: -20
-      },
+      headerStyle: style.editNoteHeaderStyle,
       headerTintColor: '#18C4E6',
       headerRight: params.action,
       headerTruncatedBackTitle: 'Back'
@@ -49,8 +48,8 @@ export default class EditNoteScreen extends React.Component {
   keyboardWillShow(e) {
     this.props.navigation.setParams({
       action: (
-        <TouchableOpacity onPress={() => Keyboard.dismiss()} style={{ marginRight: 15 }}>
-          <Text style={{ color: '#18C4E6', fontSize: 18 }}>Done</Text>
+        <TouchableOpacity onPress={() => Keyboard.dismiss()} style={style.actionButtons}>
+          <Text style={style.doneButtonText}>Done</Text>
         </TouchableOpacity>
       )
     });
@@ -70,16 +69,9 @@ export default class EditNoteScreen extends React.Component {
               message: this.state.text
             })
           }
-          style={{ marginRight: 15 }}
+          style={style.actionButtons}
         >
-          <Image
-            style={{
-              width: 25,
-              height: 25,
-              tintColor: '#18C4E6'
-            }}
-            source={require('../assets/images/share-icon.png')}
-          />
+          <Image style={style.editButtonText} source={require('../../assets/images/share.png')} />
         </TouchableOpacity>
       )
     });
@@ -100,7 +92,7 @@ export default class EditNoteScreen extends React.Component {
 
   render() {
     return (
-      <View style={styles.textAreaContainer}>
+      <View style={style.editNoteContainer}>
         <ScrollView keyboardDismissMode="interactive">
           <TextInput
             value={this.state.text}
@@ -120,12 +112,3 @@ export default class EditNoteScreen extends React.Component {
     );
   }
 }
-
-const styles = StyleSheet.create({
-  textAreaContainer: {
-    flex: 1,
-    paddingTop: 15,
-    paddingLeft: 15,
-    backgroundColor: '#fff'
-  }
-});
