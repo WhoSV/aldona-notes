@@ -1,13 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  TouchableHighlight,
-  TouchableOpacity,
-  Share,
-  StyleSheet,
-  Image
-} from 'react-native';
+import { View, Text, TouchableHighlight, TouchableOpacity, Share, StyleSheet, Image } from 'react-native';
 import { SwipeListView } from 'react-native-swipe-list-view';
 
 // Import database
@@ -37,10 +29,7 @@ export default class NotesScreen extends React.Component {
     super(props);
     this.state = {
       notesData: [],
-      parentFolder: this.props.navigation.getParam(
-        'parentFolder',
-        'empty-folder'
-      )
+      parentFolder: this.props.navigation.getParam('parentFolder', 'empty-folder')
     };
   }
 
@@ -49,9 +38,7 @@ export default class NotesScreen extends React.Component {
   }
 
   refreshNoteList() {
-    return database
-      .getNotesByFolderId(this.state.parentFolder)
-      .then(notesData => this.setState({ notesData }));
+    return database.getNotesByFolderId(this.state.parentFolder).then(notesData => this.setState({ notesData }));
   }
 
   handleDeleteNote(note, rowKey, rowMap) {
@@ -91,16 +78,10 @@ export default class NotesScreen extends React.Component {
             >
               <View style={style.rowContainer}>
                 <View style={style.rowView}>
-                  <Text
-                    ellipsizeMode="tail"
-                    numberOfLines={1}
-                    style={style.rowTitle}
-                  >
+                  <Text ellipsizeMode="tail" numberOfLines={1} style={style.rowTitle}>
                     {rowData.item.text}
                   </Text>
-                  <Text style={style.rowSubtitle}>
-                    {rowData.item.updated_at}
-                  </Text>
+                  <Text style={style.rowSubtitle}>{rowData.item.updated_at}</Text>
                 </View>
                 <View style={style.rowIcon}>
                   <Image
@@ -116,12 +97,7 @@ export default class NotesScreen extends React.Component {
           )}
           renderHiddenItem={(rowData, rowMap) => (
             <View style={style.rowBack}>
-              <TouchableOpacity
-                style={[style.backRightBtn, style.backRightBtnLeft]}
-                onPress={_ =>
-                  this.handleShareNote(rowData.item, rowData.item.id, rowMap)
-                }
-              >
+              <TouchableOpacity style={[style.backRightBtn, style.backRightBtnLeft]} onPress={_ => this.handleShareNote(rowData.item, rowData.item.id, rowMap)}>
                 <Image
                   style={{
                     width: 25,
@@ -132,9 +108,7 @@ export default class NotesScreen extends React.Component {
               </TouchableOpacity>
               <TouchableOpacity
                 style={[style.backRightBtn, style.backRightBtnRight]}
-                onPress={_ =>
-                  this.handleDeleteNote(rowData.item, rowData.item.id, rowMap)
-                }
+                onPress={_ => this.handleDeleteNote(rowData.item, rowData.item.id, rowMap)}
               >
                 <Image
                   style={{

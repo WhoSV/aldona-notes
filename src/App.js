@@ -64,16 +64,10 @@ export default class App extends React.Component {
 
   // Handle the app going from foreground to background, and vice versa.
   handleAppStateChange(nextAppState) {
-    if (
-      this.state.appState.match(/inactive|background/) &&
-      nextAppState === 'active'
-    ) {
+    if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
       // App has moved from the background (or inactive) into the foreground
       this.appIsNowRunningInForeground();
-    } else if (
-      this.state.appState === 'active' &&
-      nextAppState.match(/inactive|background/)
-    ) {
+    } else if (this.state.appState === 'active' && nextAppState.match(/inactive|background/)) {
       // App has moved from the foreground into the background (or become inactive)
       this.appHasGoneToTheBackground();
     }

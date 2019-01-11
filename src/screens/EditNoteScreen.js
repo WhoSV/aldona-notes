@@ -1,16 +1,5 @@
 import React from 'react';
-import {
-  View,
-  TextInput,
-  StyleSheet,
-  ScrollView,
-  Keyboard,
-  Dimensions,
-  TouchableOpacity,
-  Text,
-  Share,
-  Image
-} from 'react-native';
+import { View, TextInput, StyleSheet, ScrollView, Keyboard, Dimensions, TouchableOpacity, Text, Share, Image } from 'react-native';
 
 // Import database
 import { database } from '../database/Database';
@@ -48,14 +37,8 @@ export default class EditNoteScreen extends React.Component {
     this.setState({
       text: this.state.noteToUpdate.text
     });
-    this.keyboardWillShowListener = Keyboard.addListener(
-      'keyboardWillShow',
-      this.keyboardWillShow
-    );
-    this.keyboardWillHideListener = Keyboard.addListener(
-      'keyboardWillHide',
-      this.keyboardWillHide
-    );
+    this.keyboardWillShowListener = Keyboard.addListener('keyboardWillShow', this.keyboardWillShow);
+    this.keyboardWillHideListener = Keyboard.addListener('keyboardWillHide', this.keyboardWillHide);
   }
 
   componentWillUnmount() {
@@ -66,17 +49,13 @@ export default class EditNoteScreen extends React.Component {
   keyboardWillShow(e) {
     this.props.navigation.setParams({
       action: (
-        <TouchableOpacity
-          onPress={() => Keyboard.dismiss()}
-          style={{ marginRight: 15 }}
-        >
+        <TouchableOpacity onPress={() => Keyboard.dismiss()} style={{ marginRight: 15 }}>
           <Text style={{ color: '#18C4E6', fontSize: 18 }}>Done</Text>
         </TouchableOpacity>
       )
     });
     this.setState({
-      visibleHeight:
-        Dimensions.get('window').height - e.endCoordinates.height - 100
+      visibleHeight: Dimensions.get('window').height - e.endCoordinates.height - 100
     });
   }
 
@@ -113,13 +92,9 @@ export default class EditNoteScreen extends React.Component {
     console.log(this.state.noteToUpdate);
     console.log(this.state.text);
     if (this.state.text === null || this.state.text === '') {
-      database
-        .deleteNote(this.state.noteToUpdate)
-        .then(() => this.props.navigation.state.params.refreshNoteList());
+      database.deleteNote(this.state.noteToUpdate).then(() => this.props.navigation.state.params.refreshNoteList());
     } else {
-      database
-        .updateNote(this.state.text, this.state.noteToUpdate)
-        .then(() => this.props.navigation.state.params.refreshNoteList());
+      database.updateNote(this.state.text, this.state.noteToUpdate).then(() => this.props.navigation.state.params.refreshNoteList());
     }
   }
 

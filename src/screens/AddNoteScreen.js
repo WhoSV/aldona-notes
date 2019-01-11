@@ -1,16 +1,5 @@
 import React from 'react';
-import {
-  View,
-  TextInput,
-  StyleSheet,
-  ScrollView,
-  Keyboard,
-  Dimensions,
-  TouchableOpacity,
-  Text,
-  Share,
-  Image
-} from 'react-native';
+import { View, TextInput, StyleSheet, ScrollView, Keyboard, Dimensions, TouchableOpacity, Text, Share, Image } from 'react-native';
 import { NavigationActions } from 'react-navigation';
 
 // Import database
@@ -63,9 +52,7 @@ export default class AddNoteScreen extends React.Component {
               color: '#18C4E6'
             }}
           >
-            {params.parentFolder.title.length <= 15
-              ? params.parentFolder.title
-              : 'Back'}
+            {params.parentFolder.title.length <= 15 ? params.parentFolder.title : 'Back'}
           </Text>
         </TouchableOpacity>
       )
@@ -75,10 +62,7 @@ export default class AddNoteScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      parentFolder: this.props.navigation.getParam(
-        'parentFolder',
-        'empty-folder'
-      ),
+      parentFolder: this.props.navigation.getParam('parentFolder', 'empty-folder'),
       text: '',
       visibleHeight: 230,
       height: 0
@@ -89,14 +73,8 @@ export default class AddNoteScreen extends React.Component {
   }
 
   componentWillMount() {
-    this.keyboardWillShowListener = Keyboard.addListener(
-      'keyboardWillShow',
-      this.keyboardWillShow
-    );
-    this.keyboardWillHideListener = Keyboard.addListener(
-      'keyboardWillHide',
-      this.keyboardWillHide
-    );
+    this.keyboardWillShowListener = Keyboard.addListener('keyboardWillShow', this.keyboardWillShow);
+    this.keyboardWillHideListener = Keyboard.addListener('keyboardWillHide', this.keyboardWillHide);
   }
 
   componentWillUnmount() {
@@ -122,8 +100,7 @@ export default class AddNoteScreen extends React.Component {
       )
     });
     this.setState({
-      visibleHeight:
-        Dimensions.get('window').height - e.endCoordinates.height - 100
+      visibleHeight: Dimensions.get('window').height - e.endCoordinates.height - 100
     });
   }
 
@@ -159,9 +136,7 @@ export default class AddNoteScreen extends React.Component {
     if (this.state.text === null || this.state.text === '') {
       console.log('Empty note');
     } else {
-      database
-        .createNote(this.state.text, this.state.parentFolder)
-        .then(() => this.props.navigation.state.params.refreshNoteList());
+      database.createNote(this.state.text, this.state.parentFolder).then(() => this.props.navigation.state.params.refreshNoteList());
     }
   }
 

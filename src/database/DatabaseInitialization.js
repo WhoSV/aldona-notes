@@ -47,13 +47,7 @@ export class DatabaseInitialization {
     }
 
     // Folder table
-    transaction.executeSql(
-      'CREATE TABLE IF NOT EXISTS Folder( ' +
-        'id INTEGER PRIMARY KEY NOT NULL, ' +
-        'title TEXT, ' +
-        'updated_at TEXT' +
-        ');'
-    );
+    transaction.executeSql('CREATE TABLE IF NOT EXISTS Folder( ' + 'id INTEGER PRIMARY KEY NOT NULL, ' + 'title TEXT, ' + 'updated_at TEXT' + ');');
 
     // Note table
     transaction.executeSql(
@@ -67,12 +61,7 @@ export class DatabaseInitialization {
     );
 
     // Version table
-    transaction.executeSql(
-      'CREATE TABLE IF NOT EXISTS Version( ' +
-        'version_id INTEGER PRIMARY KEY NOT NULL, ' +
-        'version INTEGER' +
-        ');'
-    );
+    transaction.executeSql('CREATE TABLE IF NOT EXISTS Version( ' + 'version_id INTEGER PRIMARY KEY NOT NULL, ' + 'version INTEGER' + ');');
   }
 
   // Get the version of the database, as specified in the Version table

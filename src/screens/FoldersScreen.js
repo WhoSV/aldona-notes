@@ -1,13 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  AlertIOS,
-  TouchableHighlight,
-  TouchableOpacity,
-  StyleSheet,
-  Image
-} from 'react-native';
+import { View, Text, AlertIOS, TouchableHighlight, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { SwipeListView } from 'react-native-swipe-list-view';
 
 // Import database
@@ -42,9 +34,7 @@ export default class FoldersScreen extends React.Component {
   }
 
   refreshFolderList() {
-    return database
-      .getAllFolders()
-      .then(foldersData => this.setState({ foldersData }));
+    return database.getAllFolders().then(foldersData => this.setState({ foldersData }));
   }
 
   handleDeleteFolder(folder, rowKey, rowMap) {
@@ -57,24 +47,18 @@ export default class FoldersScreen extends React.Component {
       if (notesCount === 0 || notesCount === null) {
         database.deleteFolder(folder).then(() => this.refreshFolderList());
       } else {
-        AlertIOS.alert(
-          'Delete Folder?',
-          'If you delete this folder, its notes also will be deleted.',
-          [
-            {
-              text: 'Cancel'
+        AlertIOS.alert('Delete Folder?', 'If you delete this folder, its notes also will be deleted.', [
+          {
+            text: 'Cancel'
+          },
+          {
+            text: 'Delete',
+            onPress: () => {
+              database.deleteFolder(folder).then(() => this.refreshFolderList());
             },
-            {
-              text: 'Delete',
-              onPress: () => {
-                database
-                  .deleteFolder(folder)
-                  .then(() => this.refreshFolderList());
-              },
-              style: 'destructive'
-            }
-          ]
-        );
+            style: 'destructive'
+          }
+        ]);
       }
     });
   }
@@ -110,9 +94,7 @@ export default class FoldersScreen extends React.Component {
             });
 
             if (newFolderTitle !== null && newFolderTitle !== '' && !unique) {
-              database
-                .updateFolder(folder, newFolderTitle)
-                .then(() => this.refreshFolderList());
+              database.updateFolder(folder, newFolderTitle).then(() => this.refreshFolderList());
             }
           }
         }
@@ -135,9 +117,7 @@ export default class FoldersScreen extends React.Component {
     });
 
     if (newFolderTitle !== null && newFolderTitle !== '' && !unique) {
-      database
-        .createFolder(newFolderTitle)
-        .then(() => this.refreshFolderList());
+      database.createFolder(newFolderTitle).then(() => this.refreshFolderList());
     }
   }
 
@@ -161,16 +141,10 @@ export default class FoldersScreen extends React.Component {
             >
               <View style={style.rowContainer}>
                 <View style={style.rowView}>
-                  <Text
-                    ellipsizeMode="tail"
-                    numberOfLines={1}
-                    style={style.rowTitle}
-                  >
+                  <Text ellipsizeMode="tail" numberOfLines={1} style={style.rowTitle}>
                     {rowData.item.title}
                   </Text>
-                  <Text style={style.rowSubtitle}>
-                    {rowData.item.updated_at}
-                  </Text>
+                  <Text style={style.rowSubtitle}>{rowData.item.updated_at}</Text>
                 </View>
                 <View style={style.rowIcon}>
                   <Image
@@ -188,9 +162,7 @@ export default class FoldersScreen extends React.Component {
             <View style={style.rowBack}>
               <TouchableOpacity
                 style={[style.backRightBtn, style.backRightBtnLeft]}
-                onPress={_ =>
-                  this.handleUpdateFolder(rowData.item, rowData.item.id, rowMap)
-                }
+                onPress={_ => this.handleUpdateFolder(rowData.item, rowData.item.id, rowMap)}
               >
                 <Image
                   style={{
@@ -202,9 +174,7 @@ export default class FoldersScreen extends React.Component {
               </TouchableOpacity>
               <TouchableOpacity
                 style={[style.backRightBtn, style.backRightBtnRight]}
-                onPress={_ =>
-                  this.handleDeleteFolder(rowData.item, rowData.item.id, rowMap)
-                }
+                onPress={_ => this.handleDeleteFolder(rowData.item, rowData.item.id, rowMap)}
               >
                 <Image
                   style={{
@@ -237,8 +207,7 @@ export default class FoldersScreen extends React.Component {
                   },
                   {
                     text: 'OK',
-                    onPress: newFolderName =>
-                      this.handleCreateFolder(newFolderName)
+                    onPress: newFolderName => this.handleCreateFolder(newFolderName)
                   }
                 ],
                 'plain-text'

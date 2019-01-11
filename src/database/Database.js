@@ -43,37 +43,19 @@ export class Database {
 
   createFolder(newFolderTitle) {
     return this.getDatabase()
-      .then(db =>
-        db.executeSql('INSERT INTO Folder (title, updated_at) VALUES (?, ?);', [
-          newFolderTitle,
-          Moment(new Date()).calendar()
-        ])
-      )
+      .then(db => db.executeSql('INSERT INTO Folder (title, updated_at) VALUES (?, ?);', [newFolderTitle, Moment(new Date()).calendar()]))
       .then(([results]) => {
         const { insertId } = results;
-        console.log(
-          `[db] Added folder with title: "${newFolderTitle}"! InsertId: ${insertId}`
-        );
+        console.log(`[db] Added folder with title: "${newFolderTitle}"! InsertId: ${insertId}`);
       });
   }
 
   updateFolder(folder, newFolderTitle) {
-    console.log(
-      `[db] Updating folder: "${folder.title}" with id: ${folder.id}`
-    );
+    console.log(`[db] Updating folder: "${folder.title}" with id: ${folder.id}`);
     return this.getDatabase()
-      .then(db =>
-        db.executeSql(
-          'UPDATE Folder set title = ?, updated_at = ? where id = ?;',
-          [newFolderTitle, Moment(new Date()).calendar(), folder.id]
-        )
-      )
+      .then(db => db.executeSql('UPDATE Folder set title = ?, updated_at = ? where id = ?;', [newFolderTitle, Moment(new Date()).calendar(), folder.id]))
       .then(() => {
-        console.log(
-          `[db] Updated folder with title: "${
-            folder.title
-          }"! Now new title: ${newFolderTitle}`
-        );
+        console.log(`[db] Updated folder with title: "${folder.title}"! Now new title: ${newFolderTitle}`);
       });
   }
 
@@ -101,19 +83,13 @@ export class Database {
   }
 
   deleteFolder(folder) {
-    console.log(
-      `[db] Deleting folder titled: "${folder.title}" with id: ${folder.id}`
-    );
+    console.log(`[db] Deleting folder titled: "${folder.title}" with id: ${folder.id}`);
     return this.getDatabase()
       .then(db => {
         // Delete folder notes first, then delete the folder itself
-        return db
-          .executeSql('DELETE FROM Note WHERE folder_id = ?;', [folder.id])
-          .then(() => db);
+        return db.executeSql('DELETE FROM Note WHERE folder_id = ?;', [folder.id]).then(() => db);
       })
-      .then(db =>
-        db.executeSql('DELETE FROM Folder WHERE id = ?;', [folder.id])
-      )
+      .then(db => db.executeSql('DELETE FROM Folder WHERE id = ?;', [folder.id]))
       .then(() => {
         console.log(`[db] Deleted folder titled: "${folder.title}"!`);
         return;
@@ -125,10 +101,7 @@ export class Database {
     return this.getDatabase()
       .then(db =>
         // Get folders notes count
-        db.executeSql(
-          'SELECT count(*) as count FROM Note WHERE folder_id = ?;',
-          [folder.id]
-        )
+        db.executeSql('SELECT count(*) as count FROM Note WHERE folder_id = ?;', [folder.id])
       )
       .then(([results]) => {
         if (results === undefined) {
@@ -150,17 +123,10 @@ export class Database {
       return Promise.reject(Error(`Could not add note to undefined folder.`));
     }
     return this.getDatabase()
-      .then(db =>
-        db.executeSql(
-          'INSERT INTO Note (text, updated_at, folder_id) VALUES (?, ?, ?);',
-          [text, Moment(new Date()).calendar(), folder.id]
-        )
-      )
+      .then(db => db.executeSql('INSERT INTO Note (text, updated_at, folder_id) VALUES (?, ?, ?);', [text, Moment(new Date()).calendar(), folder.id]))
       .then(([results]) => {
         const { insertId } = results;
-        console.log(
-          `[db] Note with "${text}" created successfully with id: ${insertId}`
-        );
+        console.log(`[db] Note with "${text}" created successfully with id: ${insertId}`);
       });
   }
 
@@ -170,16 +136,9 @@ export class Database {
 
     console.log(`[db] Updating note: "${note.text}" with id: ${note.id}`);
     return this.getDatabase()
-      .then(db =>
-        db.executeSql(
-          'UPDATE Note set text = ?, updated_at = ? where id = ?;',
-          [text, Moment(new Date()).calendar(), note.id]
-        )
-      )
+      .then(db => db.executeSql('UPDATE Note set text = ?, updated_at = ? where id = ?;', [text, Moment(new Date()).calendar(), note.id]))
       .then(() => {
-        console.log(
-          `[db] Updated note with text: "${note.text}"! Now new text: ${text}`
-        );
+        console.log(`[db] Updated note with text: "${note.text}"! Now new text: ${text}`);
       });
   }
 
@@ -188,12 +147,7 @@ export class Database {
       return Promise.resolve([]);
     }
     return this.getDatabase()
-      .then(db =>
-        db.executeSql(
-          `SELECT * FROM Note WHERE folder_id = ? ORDER BY updated_at DESC;`,
-          [folder.id]
-        )
-      )
+      .then(db => db.executeSql(`SELECT * FROM Note WHERE folder_id = ? ORDER BY updated_at DESC;`, [folder.id]))
       .then(([results]) => {
         if (results === undefined) {
           return [];
@@ -203,9 +157,7 @@ export class Database {
         for (let i = 0; i < count; i++) {
           const row = results.rows.item(i);
           const { id, text, updated_at, folder_id } = row;
-          console.log(
-            `[db] List note id: ${id} text: ${text}, updated_at: ${updated_at}, fodlerId: ${folder_id} `
-          );
+          console.log(`[db] List note id: ${id} text: ${text}, updated_at: ${updated_at}, fodlerId: ${folder_id} `);
           note.push({ id, text, updated_at, folder_id });
         }
         console.log(`[db] List notes for folder "${folder.title}":`, note);
@@ -214,14 +166,10 @@ export class Database {
   }
 
   deleteNote(note) {
-    console.log(
-      `[db] Deleting note titled: "${note.text}" with id: ${note.id}`
-    );
+    console.log(`[db] Deleting note titled: "${note.text}" with id: ${note.id}`);
     return this.getDatabase()
       .then(db => {
-        return db
-          .executeSql('DELETE FROM Note WHERE id = ?;', [note.id])
-          .then(() => db);
+        return db.executeSql('DELETE FROM Note WHERE id = ?;', [note.id]).then(() => db);
       })
       .then(() => {
         console.log(`[db] Deleted note titled: "${note.text}"!`);
