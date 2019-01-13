@@ -1,5 +1,8 @@
 import React from 'react';
-import { View, TextInput, ScrollView, Keyboard, Dimensions, TouchableOpacity, Text, Share, Image } from 'react-native';
+import PropTypes from 'prop-types';
+import {
+  View, TextInput, ScrollView, Keyboard, Dimensions, TouchableOpacity, Text, Share, Image,
+} from 'react-native';
 import { NavigationActions } from 'react-navigation';
 
 // Import database
@@ -8,8 +11,12 @@ import { database } from '../../database/Database';
 // Import styles
 import style from './style';
 
+// Import Icons
+const backIcon = require('../../assets/images/back.png');
+const shareIcon = require('../../assets/images/share.png');
+
 // Declare for using func inside navigationOptions
-let _this;
+let addNoteThis;
 
 export default class AddNoteComponent extends React.Component {
   // Header Component
@@ -24,23 +31,24 @@ export default class AddNoteComponent extends React.Component {
           style={style.addNoteHeaderBackButton}
           onPress={() => {
             navigation.dispatch(NavigationActions.back());
-            _this.handleAddNote();
+            addNoteThis.handleAddNote();
           }}
         >
-          <Image source={require('../../assets/images/back.png')} fadeDuration={0} style={style.addNoteHeaderBackButtonImage} />
+          <Image source={backIcon} fadeDuration={0} style={style.addNoteHeaderBackButtonImage} />
           <Text style={style.addNoteHeaderBackButtonText}>{params.parentFolder.title.length <= 15 ? params.parentFolder.title : 'Back'}</Text>
         </TouchableOpacity>
-      )
+      ),
     };
   };
 
   constructor(props) {
     super(props);
+
+    const { navigation } = this.props;
     this.state = {
-      parentFolder: this.props.navigation.getParam('parentFolder', 'empty-folder'),
+      parentFolder: navigation.getParam('parentFolder', 'empty-folder'),
       text: '',
       visibleHeight: 230,
-      height: 0
     };
 
     this.keyboardWillShow = this.keyboardWillShow.bind(this);
@@ -52,17 +60,19 @@ export default class AddNoteComponent extends React.Component {
     this.keyboardWillHideListener = Keyboard.addListener('keyboardWillHide', this.keyboardWillHide);
   }
 
+  componentDidMount() {
+    addNoteThis = this;
+  }
+
   componentWillUnmount() {
     this.keyboardWillShowListener.remove();
     this.keyboardWillHideListener.remove();
   }
 
-  componentDidMount() {
-    _this = this;
-  }
-
   keyboardWillShow(e) {
-    this.props.navigation.setParams({
+    const { navigation } = this.props;
+
+    navigation.setParams({
       action: (
         <TouchableOpacity
           onPress={() => {
@@ -72,60 +82,73 @@ export default class AddNoteComponent extends React.Component {
         >
           <Text style={style.doneButtonText}>Done</Text>
         </TouchableOpacity>
-      )
+      ),
     });
     this.setState({
-      visibleHeight: Dimensions.get('window').height - e.endCoordinates.height - 100
+      visibleHeight: Dimensions.get('window').height - e.endCoordinates.height - 100,
     });
   }
 
   keyboardWillHide() {
-    this.props.navigation.setParams({
+    const { text } = this.state;
+    const { navigation } = this.props;
+
+    navigation.setParams({
       action: (
         <TouchableOpacity
-          onPress={() =>
-            Share.share({
-              message: this.state.text
-            })
+          onPress={() => Share.share({
+            message: text,
+          })
           }
           style={style.actionButtons}
         >
-          <Image style={style.editButtonText} source={require('../../assets/images/share.png')} />
+          <Image style={style.editButtonText} source={shareIcon} />
         </TouchableOpacity>
-      )
+      ),
     });
     this.setState({
-      visibleHeight: Dimensions.get('window').height - 100
+      visibleHeight: Dimensions.get('window').height - 100,
     });
   }
 
   // Save note func
   handleAddNote() {
-    if (this.state.text === null || this.state.text === '') {
+    const { text, parentFolder } = this.state;
+    const { navigation } = this.props;
+
+    if (text === null || text === '') {
       console.log('Empty note');
     } else {
-      database.createNote(this.state.text, this.state.parentFolder).then(() => this.props.navigation.state.params.refreshNoteList());
+      database.createNote(text, parentFolder).then(() => navigation.state.params.refreshNoteList());
     }
   }
 
   render() {
+    const { visibleHeight } = this.state;
+
     return (
       <View style={style.addNoteContainer}>
         <ScrollView keyboardDismissMode="interactive">
           <TextInput
             onChangeText={text => this.setState({ text })}
             style={{
-              height: this.state.visibleHeight - 20,
+              height: visibleHeight - 20,
               paddingRight: 15,
               fontSize: 18,
-              color: '#4A4A4A'
+              color: '#4A4A4A',
             }}
-            textAlignVertical={'top'}
-            multiline={true}
-            autoFocus={true}
+            textAlignVertical="top"
+            multiline
+            autoFocus
           />
         </ScrollView>
       </View>
     );
   }
 }
+
+AddNoteComponent.propTypes = {
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func.isRequired,
+  }).isRequired,
+};

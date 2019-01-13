@@ -1,5 +1,8 @@
 import React from 'react';
-import { View, Text, TouchableHighlight, TouchableOpacity, Share, Image } from 'react-native';
+import PropTypes from 'prop-types';
+import {
+  View, Text, TouchableHighlight, TouchableOpacity, Share, Image,
+} from 'react-native';
 import { SwipeListView } from 'react-native-swipe-list-view';
 
 // Import database
@@ -7,6 +10,12 @@ import { database } from '../../database/Database';
 
 // Import styles
 import style from './style';
+
+// Import Icons
+const forwardIcon = require('../../assets/images/forward.png');
+const shareIcon = require('../../assets/images/share.png');
+const deleteIcon = require('../../assets/images/delete.png');
+const addIcon = require('../../assets/images/add.png');
 
 export default class NoteComponent extends React.Component {
   // Header Component
@@ -16,15 +25,18 @@ export default class NoteComponent extends React.Component {
       title: params ? params.parentFolder.title : 'Notes',
       headerStyle: style.noteHeaderStyle,
       headerTintColor: '#18C4E6',
-      headerTitleStyle: style.noteHeaderTitleStyle
+      headerTitleStyle: style.noteHeaderTitleStyle,
     };
   };
 
   constructor(props) {
     super(props);
+
+    const { navigation } = this.props;
+
     this.state = {
       notesData: [],
-      parentFolder: this.props.navigation.getParam('parentFolder', 'empty-folder')
+      parentFolder: navigation.getParam('parentFolder', 'empty-folder'),
     };
   }
 
@@ -32,8 +44,18 @@ export default class NoteComponent extends React.Component {
     this.refreshNoteList();
   }
 
+  // Here define item to be shared
+  handleShareNote = (note, rowKey, rowMap) => {
+    rowMap[rowKey] && rowMap[rowKey].closeRow();
+
+    Share.share({
+      message: note.text,
+    });
+  };
+
   refreshNoteList() {
-    return database.getNotesByFolderId(this.state.parentFolder).then(notesData => this.setState({ notesData }));
+    const { parentFolder } = this.state;
+    return database.getNotesByFolderId(parentFolder).then(notesData => this.setState({ notesData }));
   }
 
   handleDeleteNote(note, rowKey, rowMap) {
@@ -43,31 +65,20 @@ export default class NoteComponent extends React.Component {
     database.deleteNote(note).then(() => this.refreshNoteList());
   }
 
-  // Here define item to be shared
-  handleShareNote(note, rowKey, rowMap) {
-    rowMap[rowKey] && rowMap[rowKey].closeRow();
-
-    Share.share({
-      message: note.text
-    });
-  }
-
   render() {
+    const { notesData, parentFolder } = this.state;
+    const { navigation } = this.props;
+
     return (
       <View style={style.noteContainer}>
         {/* Flat List View */}
         <SwipeListView
-          useFlatList={true}
+          useFlatList
           style={style.container}
-          data={this.state.notesData}
+          data={notesData}
           renderItem={rowData => (
             <TouchableHighlight
-              onPress={() =>
-                this.props.navigation.navigate('EditNoteComponent', {
-                  note: rowData.item,
-                  refreshNoteList: this.refreshNoteList.bind(this)
-                })
-              }
+              onPress={() => navigation.navigate('EditNoteComponent', { note: rowData.item, refreshNoteList: this.refreshNoteList.bind(this) })}
               style={style.row}
               underlayColor="#ECECED"
             >
@@ -76,10 +87,10 @@ export default class NoteComponent extends React.Component {
                   <Text ellipsizeMode="tail" numberOfLines={1} style={style.rowTitle}>
                     {rowData.item.text}
                   </Text>
-                  <Text style={style.rowSubtitle}>{rowData.item.updated_at}</Text>
+                  <Text style={style.rowSubtitle}>{rowData.item.updatedAt}</Text>
                 </View>
                 <View style={style.rowIcon}>
-                  <Image style={style.rowIconImage} source={require('../../assets/images/forward.png')} />
+                  <Image style={style.rowIconImage} source={forwardIcon} />
                 </View>
               </View>
             </TouchableHighlight>
@@ -87,19 +98,19 @@ export default class NoteComponent extends React.Component {
           renderHiddenItem={(rowData, rowMap) => (
             <View style={style.rowBack}>
               <TouchableOpacity style={[style.backRightBtn, style.backRightBtnLeft]} onPress={_ => this.handleShareNote(rowData.item, rowData.item.id, rowMap)}>
-                <Image style={style.backShareIcon} source={require('../../assets/images/share.png')} />
+                <Image style={style.backShareIcon} source={shareIcon} />
               </TouchableOpacity>
               <TouchableOpacity
                 style={[style.backRightBtn, style.backRightBtnRight]}
                 onPress={_ => this.handleDeleteNote(rowData.item, rowData.item.id, rowMap)}
               >
-                <Image style={style.backDeleteIcon} source={require('../../assets/images/delete.png')} />
+                <Image style={style.backDeleteIcon} source={deleteIcon} />
               </TouchableOpacity>
             </View>
           )}
-          keyExtractor={rowData => '' + rowData.id}
-          enableEmptySections={true}
-          disableRightSwipe={true}
+          keyExtractor={rowData => `${rowData.id}`}
+          enableEmptySections
+          disableRightSwipe
           rightOpenValue={-150}
         />
 
@@ -107,17 +118,18 @@ export default class NoteComponent extends React.Component {
         <View style={style.addButtonView}>
           <TouchableOpacity
             style={style.addButton}
-            onPress={() =>
-              this.props.navigation.navigate('AddNoteComponent', {
-                parentFolder: this.state.parentFolder,
-                refreshNoteList: this.refreshNoteList.bind(this)
-              })
-            }
+            onPress={() => navigation.navigate('AddNoteComponent', { parentFolder, refreshNoteList: this.refreshNoteList.bind(this) })}
           >
-            <Image style={style.addButtonImage} source={require('../../assets/images/add.png')} />
+            <Image style={style.addButtonImage} source={addIcon} />
           </TouchableOpacity>
         </View>
       </View>
     );
   }
 }
+
+NoteComponent.propTypes = {
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func.isRequired,
+  }).isRequired,
+};

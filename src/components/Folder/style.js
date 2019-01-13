@@ -5,25 +5,25 @@ export default StyleSheet.create({
   folderHeaderStyle: {
     borderBottomWidth: 0,
     height: 50,
-    marginBottom: -20
+    marginBottom: -20,
   },
 
   folderHeaderTitleStyle: {
     fontWeight: '300',
     fontSize: 25,
-    color: '#18C4E6'
+    color: '#18C4E6',
   },
 
   // Component style
   folderContainer: {
     backgroundColor: 'white',
-    flex: 1
+    flex: 1,
   },
 
   container: {
     marginTop: 20,
     borderTopWidth: 0,
-    backgroundColor: '#fff'
+    backgroundColor: '#fff',
   },
 
   row: {
@@ -33,38 +33,38 @@ export default StyleSheet.create({
     paddingLeft: 20,
     paddingRight: 7,
     borderBottomColor: '#ECECED',
-    borderBottomWidth: 1
+    borderBottomWidth: 1,
   },
 
   rowContainer: {
     flexDirection: 'row',
-    flexWrap: 'wrap'
+    flexWrap: 'wrap',
   },
 
   rowView: {
-    width: '92%'
+    width: '92%',
   },
 
   rowTitle: {
     color: '#4A4A4A',
     marginRight: 10,
     paddingBottom: 3,
-    fontSize: 19
+    fontSize: 19,
   },
 
   rowSubtitle: {
     fontWeight: '300',
     color: '#ccc',
-    fontSize: 14
+    fontSize: 14,
   },
 
   rowIcon: {
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
 
   rowIconImage: {
     width: 18,
-    height: 18
+    height: 18,
   },
 
   rowBack: {
@@ -73,7 +73,7 @@ export default StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingLeft: 15
+    paddingLeft: 15,
   },
 
   backRightBtn: {
@@ -82,31 +82,31 @@ export default StyleSheet.create({
     justifyContent: 'center',
     position: 'absolute',
     top: 0,
-    width: 75
+    width: 75,
   },
 
   backRightBtnLeft: {
     backgroundColor: '#007aff',
-    right: 75
+    right: 75,
   },
 
   backRightBtnRight: {
     backgroundColor: '#ff3b30',
-    right: 0
+    right: 0,
   },
 
   backEditIcon: {
     width: 25,
-    height: 25
+    height: 25,
   },
 
   backDeleteIcon: {
     width: 30,
-    height: 30
+    height: 30,
   },
 
   addFolderButtonView: {
-    height: '8%'
+    height: '8%',
   },
 
   addFolderButton: {
@@ -114,12 +114,12 @@ export default StyleSheet.create({
     paddingTop: 13,
     paddingBottom: 10,
     paddingLeft: 10,
-    paddingRight: 13
+    paddingRight: 13,
   },
 
   addFolderButtonText: {
     color: '#18C4E6',
     fontWeight: '400',
-    fontSize: 20
-  }
+    fontSize: 20,
+  },
 });

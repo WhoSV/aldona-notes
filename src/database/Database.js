@@ -1,6 +1,6 @@
 import SQLite from 'react-native-sqlite-storage';
-import { DatabaseInitialization } from './DatabaseInitialization';
 import Moment from 'moment';
+import DatabaseInitialization from './DatabaseInitialization';
 
 export class Database {
   database;
@@ -14,9 +14,9 @@ export class Database {
 
     return SQLite.openDatabase({
       name: 'AppDatabase.db',
-      location: 'default'
+      location: 'default',
     })
-      .then(db => {
+      .then((db) => {
         databaseInstance = db;
         console.log('[db] Database open!');
 
@@ -33,9 +33,9 @@ export class Database {
   // Close the connection to the database
   close() {
     if (this.database === undefined) {
-      return Promise.reject('[db] Database was not open; unable to close.');
+      return Promise.reject(new Error('[db] Database was not open; unable to close.'));
     }
-    return this.database.close().then(status => {
+    return this.database.close().then(() => {
       console.log('[db] Database closed.');
       this.database = undefined;
     });
@@ -61,22 +61,21 @@ export class Database {
 
   getAllFolders() {
     console.log('[db] Fetching folders from the db...');
+
+    // Get all the fodlers, ordered by newest folder first
     return this.getDatabase()
-      .then(db =>
-        // Get all the fodlers, ordered by newest folder first
-        db.executeSql('SELECT * FROM Folder ORDER BY id DESC;')
-      )
+      .then(db => db.executeSql('SELECT title, id, updated_at as updatedAt FROM Folder ORDER BY id DESC;'))
       .then(([results]) => {
         if (results === undefined) {
           return [];
         }
         const count = results.rows.length;
         const folders = [];
-        for (let i = 0; i < count; i++) {
+        for (let i = 0; i < count; i += 1) {
           const row = results.rows.item(i);
-          const { title, id, updated_at } = row;
+          const { title, id, updatedAt } = row;
           console.log(`[db] Folder title: ${title}, id: ${id}`);
-          folders.push({ id, title, updated_at });
+          folders.push({ id, title, updatedAt });
         }
         return folders;
       });
@@ -84,30 +83,26 @@ export class Database {
 
   deleteFolder(folder) {
     console.log(`[db] Deleting folder titled: "${folder.title}" with id: ${folder.id}`);
+
+    // Delete folder notes first, then delete the folder itself
     return this.getDatabase()
-      .then(db => {
-        // Delete folder notes first, then delete the folder itself
-        return db.executeSql('DELETE FROM Note WHERE folder_id = ?;', [folder.id]).then(() => db);
-      })
+      .then(db => db.executeSql('DELETE FROM Note WHERE folder_id = ?;', [folder.id]).then(() => db))
       .then(db => db.executeSql('DELETE FROM Folder WHERE id = ?;', [folder.id]))
       .then(() => {
         console.log(`[db] Deleted folder titled: "${folder.title}"!`);
-        return;
       });
   }
 
   getNotesCount(folder) {
     console.log('[db] Fetching folders notes count from the db...');
+
+    // Get folders notes count
     return this.getDatabase()
-      .then(db =>
-        // Get folders notes count
-        db.executeSql('SELECT count(*) as count FROM Note WHERE folder_id = ?;', [folder.id])
-      )
+      .then(db => db.executeSql('SELECT count(*) as count FROM Note WHERE folder_id = ?;', [folder.id]))
       .then(([results]) => {
         if (results === undefined) {
           return 0;
         }
-
         const row = results.rows.item(0);
         const { count } = row;
         console.log(`[db] Notes count: ${count} in folder: ${folder.title}`);
@@ -115,12 +110,12 @@ export class Database {
       });
   }
 
-  createNote(text, folder) {
+  createNote(newText, folder) {
     // Remove spaces from string
-    text = text.trim();
+    const text = newText.trim();
 
     if (folder === undefined) {
-      return Promise.reject(Error(`Could not add note to undefined folder.`));
+      return Promise.reject(new Error('Could not add note to undefined folder.'));
     }
     return this.getDatabase()
       .then(db => db.executeSql('INSERT INTO Note (text, updated_at, folder_id) VALUES (?, ?, ?);', [text, Moment(new Date()).calendar(), folder.id]))
@@ -130,9 +125,9 @@ export class Database {
       });
   }
 
-  updateNote(text, note) {
+  updateNote(newText, note) {
     // Remove spaces from string
-    text = text.trim();
+    const text = newText.trim();
 
     console.log(`[db] Updating note: "${note.text}" with id: ${note.id}`);
     return this.getDatabase()
@@ -147,18 +142,25 @@ export class Database {
       return Promise.resolve([]);
     }
     return this.getDatabase()
-      .then(db => db.executeSql(`SELECT * FROM Note WHERE folder_id = ? ORDER BY updated_at DESC;`, [folder.id]))
+      .then(db => db.executeSql('SELECT id, text, updated_at as updatedAt, folder_id as folderId FROM Note WHERE folder_id = ? ORDER BY updated_at DESC;', [folder.id]))
       .then(([results]) => {
         if (results === undefined) {
           return [];
         }
         const count = results.rows.length;
         const note = [];
-        for (let i = 0; i < count; i++) {
+        for (let i = 0; i < count; i += 1) {
           const row = results.rows.item(i);
-          const { id, text, updated_at, folder_id } = row;
-          console.log(`[db] List note id: ${id} text: ${text}, updated_at: ${updated_at}, fodlerId: ${folder_id} `);
-          note.push({ id, text, updated_at, folder_id });
+          const {
+            id, text, updatedAt, folderId,
+          } = row;
+          console.log(`[db] List note id: ${id} text: ${text}, updated_at: ${updatedAt}, fodlerId: ${folderId} `);
+          note.push({
+            id,
+            text,
+            updatedAt,
+            folderId,
+          });
         }
         console.log(`[db] List notes for folder "${folder.title}":`, note);
         return note;
@@ -168,12 +170,9 @@ export class Database {
   deleteNote(note) {
     console.log(`[db] Deleting note titled: "${note.text}" with id: ${note.id}`);
     return this.getDatabase()
-      .then(db => {
-        return db.executeSql('DELETE FROM Note WHERE id = ?;', [note.id]).then(() => db);
-      })
+      .then(db => db.executeSql('DELETE FROM Note WHERE id = ?;', [note.id]).then(() => db))
       .then(() => {
         console.log(`[db] Deleted note titled: "${note.text}"!`);
-        return;
       });
   }
 

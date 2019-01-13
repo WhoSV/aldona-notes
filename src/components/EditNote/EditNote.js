@@ -1,11 +1,17 @@
 import React from 'react';
-import { View, TextInput, ScrollView, Keyboard, Dimensions, TouchableOpacity, Text, Share, Image } from 'react-native';
+import PropTypes from 'prop-types';
+import {
+  View, TextInput, ScrollView, Keyboard, Dimensions, TouchableOpacity, Text, Share, Image,
+} from 'react-native';
 
 // Import database
 import { database } from '../../database/Database';
 
 // Import styles
 import style from './style';
+
+// Import Icons
+const shareIcon = require('../../assets/images/share.png');
 
 export default class EditNoteComponent extends React.Component {
   // Header Component
@@ -15,17 +21,18 @@ export default class EditNoteComponent extends React.Component {
       headerStyle: style.editNoteHeaderStyle,
       headerTintColor: '#18C4E6',
       headerRight: params.action,
-      headerTruncatedBackTitle: 'Back'
+      headerTruncatedBackTitle: 'Back',
     };
   };
 
   constructor(props) {
     super(props);
+
+    const { navigation } = this.props;
     this.state = {
-      noteToUpdate: this.props.navigation.getParam('note', 'empty-note'),
+      noteToUpdate: navigation.getParam('note', 'empty-note'),
       text: '',
       visibleHeight: 230,
-      height: 0
     };
 
     this.keyboardWillShow = this.keyboardWillShow.bind(this);
@@ -33,8 +40,9 @@ export default class EditNoteComponent extends React.Component {
   }
 
   componentWillMount() {
+    const { noteToUpdate } = this.state;
     this.setState({
-      text: this.state.noteToUpdate.text
+      text: noteToUpdate.text,
     });
     this.keyboardWillShowListener = Keyboard.addListener('keyboardWillShow', this.keyboardWillShow);
     this.keyboardWillHideListener = Keyboard.addListener('keyboardWillHide', this.keyboardWillHide);
@@ -46,69 +54,82 @@ export default class EditNoteComponent extends React.Component {
   }
 
   keyboardWillShow(e) {
-    this.props.navigation.setParams({
+    const { navigation } = this.props;
+
+    navigation.setParams({
       action: (
         <TouchableOpacity onPress={() => Keyboard.dismiss()} style={style.actionButtons}>
           <Text style={style.doneButtonText}>Done</Text>
         </TouchableOpacity>
-      )
+      ),
     });
     this.setState({
-      visibleHeight: Dimensions.get('window').height - e.endCoordinates.height - 100
+      visibleHeight: Dimensions.get('window').height - e.endCoordinates.height - 100,
     });
   }
 
   keyboardWillHide() {
+    const { text } = this.state;
+    const { navigation } = this.props;
+
     this.handleEditNote();
 
-    this.props.navigation.setParams({
+    navigation.setParams({
       action: (
         <TouchableOpacity
-          onPress={() =>
-            Share.share({
-              message: this.state.text
-            })
+          onPress={() => Share.share({
+            message: text,
+          })
           }
           style={style.actionButtons}
         >
-          <Image style={style.editButtonText} source={require('../../assets/images/share.png')} />
+          <Image style={style.editButtonText} source={shareIcon} />
         </TouchableOpacity>
-      )
+      ),
     });
     this.setState({
-      visibleHeight: Dimensions.get('window').height - 100
+      visibleHeight: Dimensions.get('window').height - 100,
     });
   }
 
   handleEditNote() {
-    console.log(this.state.noteToUpdate);
-    console.log(this.state.text);
-    if (this.state.text === null || this.state.text === '') {
-      database.deleteNote(this.state.noteToUpdate).then(() => this.props.navigation.state.params.refreshNoteList());
+    const { text, noteToUpdate } = this.state;
+    const { navigation } = this.props;
+
+    if (text === null || text === '') {
+      database.deleteNote(noteToUpdate).then(() => navigation.state.params.refreshNoteList());
     } else {
-      database.updateNote(this.state.text, this.state.noteToUpdate).then(() => this.props.navigation.state.params.refreshNoteList());
+      database.updateNote(text, noteToUpdate).then(() => navigation.state.params.refreshNoteList());
     }
   }
 
   render() {
+    const { text, visibleHeight } = this.state;
+
     return (
       <View style={style.editNoteContainer}>
         <ScrollView keyboardDismissMode="interactive">
           <TextInput
-            value={this.state.text}
-            onChangeText={text => this.setState({ text })}
+            value={text}
+            onChangeText={newText => this.setState({ text: newText })}
             style={{
-              height: this.state.visibleHeight - 20,
+              height: visibleHeight - 20,
               paddingRight: 15,
               fontSize: 18,
-              color: '#4A4A4A'
+              color: '#4A4A4A',
             }}
-            textAlignVertical={'top'}
-            multiline={true}
-            autoFocus={true}
+            textAlignVertical="top"
+            multiline
+            autoFocus
           />
         </ScrollView>
       </View>
     );
   }
 }
+
+EditNoteComponent.propTypes = {
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func.isRequired,
+  }).isRequired,
+};

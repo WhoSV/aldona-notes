@@ -1,5 +1,8 @@
 import React from 'react';
-import { View, Text, AlertIOS, TouchableHighlight, TouchableOpacity, Image } from 'react-native';
+import PropTypes from 'prop-types';
+import {
+  View, Text, AlertIOS, TouchableHighlight, TouchableOpacity, Image,
+} from 'react-native';
 import { SwipeListView } from 'react-native-swipe-list-view';
 
 // Import database
@@ -8,19 +11,24 @@ import { database } from '../../database/Database';
 // Import styles
 import style from './style';
 
+// Import Icons
+const forwardIcon = require('../../assets/images/forward.png');
+const editIcon = require('../../assets/images/edit.png');
+const deleteIcon = require('../../assets/images/delete.png');
+
 export default class FolderComponent extends React.Component {
   // Header Component
   static navigationOptions = {
     title: 'Folders',
     headerStyle: style.folderHeaderStyle,
     headerTintColor: '#18C4E6',
-    headerTitleStyle: style.folderHeaderTitleStyle
+    headerTitleStyle: style.folderHeaderTitleStyle,
   };
 
   constructor(props) {
     super(props);
     this.state = {
-      foldersData: []
+      foldersData: [],
     };
   }
 
@@ -37,22 +45,20 @@ export default class FolderComponent extends React.Component {
     rowMap[rowKey] && rowMap[rowKey].closeRow();
 
     // Get notes count in this folder
-    database.getNotesCount(folder).then(notesCount => {
+    database.getNotesCount(folder).then((notesCount) => {
       // Сheck if this folder has zero notes, if no alert user
       if (notesCount === 0 || notesCount === null) {
         database.deleteFolder(folder).then(() => this.refreshFolderList());
       } else {
         AlertIOS.alert('Delete Folder?', 'If you delete this folder, its notes also will be deleted.', [
-          {
-            text: 'Cancel'
-          },
+          { text: 'Cancel' },
           {
             text: 'Delete',
             onPress: () => {
               database.deleteFolder(folder).then(() => this.refreshFolderList());
             },
-            style: 'destructive'
-          }
+            style: 'destructive',
+          },
         ]);
       }
     });
@@ -62,87 +68,90 @@ export default class FolderComponent extends React.Component {
     // Close row on touch button
     rowMap[rowKey] && rowMap[rowKey].closeRow();
 
+    const { foldersData } = this.state;
+
     AlertIOS.prompt(
       'Rename Folder',
       'Enter a new name for this folder.',
       [
         {
           text: 'Cancel',
-          style: 'cancel'
+          style: 'cancel',
         },
         {
           text: 'OK',
-          onPress: newFolderTitle => {
+          onPress: (newFolderTitle) => {
             // if name is same return
             if (newFolderTitle === folder.title) {
               return;
             }
             // Remove spaces from string
-            newFolderTitle = newFolderTitle.trim();
+            const newFolder = newFolderTitle.trim();
 
             let unique = false;
-            this.state.foldersData.map(folder => {
-              if (folder.title === newFolderTitle) {
+            foldersData.map((item) => {
+              if (item.title === newFolder) {
                 AlertIOS.alert('Please choose a different folder name');
-                return (unique = true);
+                unique = true;
+                return unique;
               }
+              return false;
             });
 
-            if (newFolderTitle !== null && newFolderTitle !== '' && !unique) {
-              database.updateFolder(folder, newFolderTitle).then(() => this.refreshFolderList());
+            if (newFolder !== null && newFolder !== '' && !unique) {
+              database.updateFolder(folder, newFolder).then(() => this.refreshFolderList());
             }
-          }
-        }
+          },
+        },
       ],
       'plain-text',
-      (defaultValue = folder.title)
+      folder.title,
     );
   }
 
   handleCreateFolder(newFolderTitle) {
     // Remove spaces from string
-    newFolderTitle = newFolderTitle.trim();
+    const newFolder = newFolderTitle.trim();
 
     let unique = false;
-    this.state.foldersData.map(folder => {
-      if (folder.title === newFolderTitle) {
+    const { foldersData } = this.state;
+
+    foldersData.map((folder) => {
+      if (folder.title === newFolder) {
         AlertIOS.alert('Please choose a different folder name');
-        return (unique = true);
+        unique = true;
+        return unique;
       }
+      return false;
     });
 
-    if (newFolderTitle !== null && newFolderTitle !== '' && !unique) {
-      database.createFolder(newFolderTitle).then(() => this.refreshFolderList());
+    if (newFolder !== null && newFolder !== '' && !unique) {
+      database.createFolder(newFolder).then(() => this.refreshFolderList());
     }
   }
 
   render() {
+    const { foldersData } = this.state;
+    const { navigation } = this.props;
+
     return (
       <View style={style.folderContainer}>
         {/* Flat List View */}
         <SwipeListView
-          useFlatList={true}
+          useFlatList
           style={style.container}
-          data={this.state.foldersData}
+          data={foldersData}
           renderItem={rowData => (
-            <TouchableHighlight
-              onPress={() =>
-                this.props.navigation.navigate('NoteComponent', {
-                  parentFolder: rowData.item
-                })
-              }
-              style={style.row}
-              underlayColor="#ECECED"
-            >
+            <TouchableHighlight onPress={() => navigation.navigate('NoteComponent', { parentFolder: rowData.item })} style={style.row} underlayColor="#ECECED">
               <View style={style.rowContainer}>
                 <View style={style.rowView}>
                   <Text ellipsizeMode="tail" numberOfLines={1} style={style.rowTitle}>
                     {rowData.item.title}
                   </Text>
-                  <Text style={style.rowSubtitle}>{rowData.item.updated_at}</Text>
+                  <Text style={style.rowSubtitle}>{rowData.item.updatedAt}</Text>
                 </View>
                 <View style={style.rowIcon}>
-                  <Image style={style.rowIconImage} source={require('../../assets/images/forward.png')} />
+                  <Image style={style.rowIconImage} source={forwardIcon} />
                 </View>
               </View>
             </TouchableHighlight>
@@ -153,19 +162,19 @@ export default class FolderComponent extends React.Component {
                 style={[style.backRightBtn, style.backRightBtnLeft]}
                 onPress={_ => this.handleUpdateFolder(rowData.item, rowData.item.id, rowMap)}
               >
-                <Image style={style.backEditIcon} source={require('../../assets/images/edit.png')} />
+                <Image style={style.backEditIcon} source={editIcon} />
               </TouchableOpacity>
               <TouchableOpacity
                 style={[style.backRightBtn, style.backRightBtnRight]}
                 onPress={_ => this.handleDeleteFolder(rowData.item, rowData.item.id, rowMap)}
               >
-                <Image style={style.backDeleteIcon} source={require('../../assets/images/delete.png')} />
+                <Image style={style.backDeleteIcon} source={deleteIcon} />
               </TouchableOpacity>
             </View>
           )}
-          keyExtractor={rowData => '' + rowData.id}
-          enableEmptySections={true}
-          disableRightSwipe={true}
+          keyExtractor={rowData => `${rowData.id}`}
+          enableEmptySections
+          disableRightSwipe
           rightOpenValue={-150}
         />
 
@@ -173,22 +182,21 @@ export default class FolderComponent extends React.Component {
         <View style={style.addFolderButtonView}>
           <TouchableOpacity
             style={style.addFolderButton}
-            onPress={() =>
-              AlertIOS.prompt(
-                'New Folder',
-                'Enter name for new folder.',
-                [
-                  {
-                    text: 'Cancel',
-                    style: 'cancel'
-                  },
-                  {
-                    text: 'OK',
-                    onPress: newFolderName => this.handleCreateFolder(newFolderName)
-                  }
-                ],
-                'plain-text'
-              )
+            onPress={() => AlertIOS.prompt(
+              'New Folder',
+              'Enter name for new folder.',
+              [
+                {
+                  text: 'Cancel',
+                  style: 'cancel',
+                },
+                {
+                  text: 'OK',
+                  onPress: newFolderName => this.handleCreateFolder(newFolderName),
+                },
+              ],
+              'plain-text',
+            )
             }
           >
             <Text style={style.addFolderButtonText}>New Folder</Text>
@@ -198,3 +206,9 @@ export default class FolderComponent extends React.Component {
     );
   }
 }
+
+FolderComponent.propTypes = {
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func.isRequired,
+  }).isRequired,
+};
