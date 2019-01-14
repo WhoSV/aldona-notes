@@ -14,6 +14,16 @@ export default StyleSheet.create({
     color: '#18C4E6',
   },
 
+  folderHeaderSettingsButtonImage: {
+    width: 25,
+    overflow: 'hidden',
+    marginLeft: 9,
+    marginRight: 6,
+    marginVertical: 12,
+    resizeMode: 'contain',
+    tintColor: '#12C4E6',
+  },
+
   // Component style
   folderContainer: {
     backgroundColor: 'white',

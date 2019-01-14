@@ -30,7 +30,6 @@ export default StyleSheet.create({
     color: '#18C4E6',
   },
 
-  // Component style
   actionButtons: {
     marginRight: 15,
   },
@@ -40,12 +39,13 @@ export default StyleSheet.create({
     fontSize: 18,
   },
 
-  editButtonText: {
+  shareButtonText: {
     width: 25,
     height: 25,
     tintColor: '#18C4E6',
   },
 
+  // Component style
   addNoteContainer: {
     flex: 1,
     paddingTop: 15,

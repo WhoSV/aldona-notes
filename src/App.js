@@ -3,23 +3,12 @@ import {
   AppState, Platform, StyleSheet, View, StatusBar,
 } from 'react-native';
 import SplashScreen from 'react-native-splash-screen';
-import { createStackNavigator } from 'react-navigation';
 
-// Import database
+// Import Database
 import { database } from './database/Database';
 
-// Import Components
-import FolderComponent from './components/Folder/Folder';
-import NoteComponent from './components/Note/Note';
-import AddNoteComponent from './components/AddNote/AddNote';
-import EditNoteComponent from './components/EditNote/EditNote';
-
-const AppNavigator = createStackNavigator({
-  FolderComponent: { screen: FolderComponent },
-  NoteComponent: { screen: NoteComponent },
-  AddNoteComponent: { screen: AddNoteComponent },
-  EditNoteComponent: { screen: EditNoteComponent },
-});
+// Import Screens
+import AppNavigator from './components/index';
 
 export default class App extends React.Component {
   constructor(props) {

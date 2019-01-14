@@ -102,7 +102,7 @@ export default class AddNoteComponent extends React.Component {
           }
           style={style.actionButtons}
         >
-          <Image style={style.editButtonText} source={shareIcon} />
+          <Image style={style.shareButtonText} source={shareIcon} />
         </TouchableOpacity>
       ),
     });

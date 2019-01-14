@@ -15,15 +15,26 @@ import style from './style';
 const forwardIcon = require('../../assets/images/forward.png');
 const editIcon = require('../../assets/images/edit.png');
 const deleteIcon = require('../../assets/images/delete.png');
+const settingsIcon = require('../../assets/images/settings.png');
 
 export default class FolderComponent extends React.Component {
   // Header Component
-  static navigationOptions = {
+  static navigationOptions = ({ navigation }) => ({
     title: 'Folders',
     headerStyle: style.folderHeaderStyle,
     headerTintColor: '#18C4E6',
     headerTitleStyle: style.folderHeaderTitleStyle,
-  };
+    headerLeft: (
+      <TouchableOpacity
+        style={style.addNoteHeaderBackButton}
+        onPress={() => {
+          navigation.navigate('SettingsComponent');
+        }}
+      >
+        <Image source={settingsIcon} fadeDuration={0} style={style.folderHeaderSettingsButtonImage} />
+      </TouchableOpacity>
+    ),
+  });
 
   constructor(props) {
     super(props);

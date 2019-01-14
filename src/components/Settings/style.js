@@ -2,32 +2,30 @@ import { StyleSheet } from 'react-native';
 
 export default StyleSheet.create({
   // Header style
-  editNoteHeaderStyle: {
+  settingsHeaderStyle: {
     borderBottomWidth: 0,
     height: 50,
     marginBottom: -20,
   },
 
-  actionButtons: {
-    marginRight: 15,
+  settingsHeaderTitleStyle: {
+    fontWeight: '300',
+    fontSize: 25,
+    color: '#18C4E6',
   },
 
-  doneButtonText: {
+  actionButtons: {
+    marginLeft: 10,
+  },
+
+  backButtonText: {
     color: '#18C4E6',
     fontSize: 18,
   },
 
-  shareButtonText: {
-    width: 25,
-    height: 25,
-    tintColor: '#18C4E6',
-  },
-
   // Component style
-  editNoteContainer: {
+  settingsContainer: {
+    backgroundColor: 'white',
     flex: 1,
-    paddingTop: 15,
-    paddingLeft: 15,
-    backgroundColor: '#fff',
   },
 });
