@@ -2,30 +2,80 @@ import { StyleSheet } from 'react-native';
 
 export default StyleSheet.create({
   // Header style
-  settingsHeaderStyle: {
-    borderBottomWidth: 0,
-    height: 50,
-    marginBottom: -20,
+  settingsHeaderBackButton: {
+    alignItems: 'center',
+    flexDirection: 'row',
   },
 
-  settingsHeaderTitleStyle: {
-    fontWeight: '300',
-    fontSize: 25,
+  settingsHeaderBackButtonImage: {
+    width: 13,
+    height: 21,
+    overflow: 'hidden',
+    marginLeft: 9,
+    marginRight: 6,
+    marginVertical: 12,
+    resizeMode: 'contain',
+  },
+
+  settingsBackButtonText: {
+    fontSize: 17,
+    paddingRight: 10,
     color: '#18C4E6',
-  },
-
-  actionButtons: {
-    marginLeft: 10,
-  },
-
-  backButtonText: {
-    color: '#18C4E6',
-    fontSize: 18,
   },
 
   // Component style
-  settingsContainer: {
-    backgroundColor: 'white',
+  container: {
+    marginTop: 20,
+    borderTopWidth: 0,
+  },
+
+  sectionHeaderContainer: {
+    paddingTop: 30,
+    paddingBottom: 10,
+  },
+
+  sectionHeaderText: {
+    fontSize: 14,
+    fontWeight: '400',
+    marginLeft: 15,
+  },
+
+  rowContainer: {
+    flexDirection: 'row',
+    marginBottom: 15,
+    marginTop: 15,
+  },
+
+  rowImage: {
+    width: 30,
+    height: 30,
+    borderRadius: 8,
+    marginLeft: 16,
+  },
+
+  rowContent: {
+    marginLeft: 10,
     flex: 1,
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+
+  rowContentName: {
+    fontSize: 16,
+    fontWeight: '500',
+  },
+
+  rowContentValue: {
+    fontSize: 16,
+    color: '#ccc',
+    fontWeight: '300',
+    marginLeft: 'auto',
+  },
+
+  switchStyle: {
+    width: 60,
+    marginRight: 6,
+    marginLeft: 6,
   },
 });

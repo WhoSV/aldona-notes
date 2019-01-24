@@ -1,15 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {
-  View, Text, AlertIOS, TouchableHighlight, TouchableOpacity, Image,
+  View, Text, AlertIOS, TouchableHighlight, TouchableOpacity, Image, StatusBar,
 } from 'react-native';
 import { SwipeListView } from 'react-native-swipe-list-view';
+import Moment from 'moment';
 
-// Import database
+// Import Database
 import { database } from '../../database/Database';
 
-// Import styles
+// Import Styles
 import style from './style';
+import themeStyle from '../shared/colorStyle';
+import defaultStyle from '../shared/defaultStyle';
+import defaultHeaderStyle from '../shared/defaultHeaderStyle';
 
 // Import Icons
 const forwardIcon = require('../../assets/images/forward.png');
@@ -17,24 +21,34 @@ const editIcon = require('../../assets/images/edit.png');
 const deleteIcon = require('../../assets/images/delete.png');
 const settingsIcon = require('../../assets/images/settings.png');
 
+// Declare for using func inside navigationOptions
+let folderThis;
+
 export default class FolderComponent extends React.Component {
   // Header Component
-  static navigationOptions = ({ navigation }) => ({
-    title: 'Folders',
-    headerStyle: style.folderHeaderStyle,
-    headerTintColor: '#18C4E6',
-    headerTitleStyle: style.folderHeaderTitleStyle,
-    headerLeft: (
-      <TouchableOpacity
-        style={style.addNoteHeaderBackButton}
-        onPress={() => {
-          navigation.navigate('SettingsComponent');
-        }}
-      >
-        <Image source={settingsIcon} fadeDuration={0} style={style.folderHeaderSettingsButtonImage} />
-      </TouchableOpacity>
-    ),
-  });
+  static navigationOptions = ({ navigation }) => {
+    const { params = {} } = navigation.state;
+
+    return {
+      title: 'Folders',
+      headerStyle: [
+        defaultHeaderStyle.header,
+        params.colorMode ? [themeStyle.backgroundSoftDark, themeStyle.darkBorder] : [themeStyle.backgroundWhite, themeStyle.lightBorder],
+      ],
+      headerTintColor: params.colorMode ? '#fff' : '#18C4E6',
+      headerTitleStyle: defaultHeaderStyle.headerTitle,
+      headerLeft: (
+        <TouchableOpacity
+          style={style.addNoteHeaderBackButton}
+          onPress={() => {
+            folderThis.navigateToSettings();
+          }}
+        >
+          <Image source={settingsIcon} fadeDuration={0} style={style.folderHeaderSettingsButtonImage} />
+        </TouchableOpacity>
+      ),
+    };
+  };
 
   constructor(props) {
     super(props);
@@ -43,11 +57,38 @@ export default class FolderComponent extends React.Component {
     };
   }
 
-  componentDidMount() {
+  componentWillMount() {
     this.refreshFolderList();
   }
 
+  componentDidMount() {
+    folderThis = this;
+  }
+
+  getConfigs() {
+    return database
+      .getConfigs()
+      .then((configs) => {
+        this.setState({ colorMode: configs[0].data[0].status, sortBy: configs[1].data[0].value.order });
+      })
+      .then(() => {
+        const { colorMode } = this.state;
+        const { navigation } = this.props;
+
+        navigation.setParams({
+          colorMode,
+        });
+      });
+  }
+
+  navigateToSettings() {
+    const { navigation } = this.props;
+
+    navigation.navigate('SettingsComponent', { refreshFolderList: folderThis.refreshFolderList.bind(this) });
+  }
+
   refreshFolderList() {
+    this.getConfigs();
     return database.getAllFolders().then(foldersData => this.setState({ foldersData }));
   }
 
@@ -76,10 +117,10 @@ export default class FolderComponent extends React.Component {
   }
 
   handleUpdateFolder(folder, rowKey, rowMap) {
+    const { foldersData } = this.state;
+
     // Close row on touch button
     rowMap[rowKey] && rowMap[rowKey].closeRow();
-
-    const { foldersData } = this.state;
 
     AlertIOS.prompt(
       'Rename Folder',
@@ -98,8 +139,8 @@ export default class FolderComponent extends React.Component {
             }
             // Remove spaces from string
             const newFolder = newFolderTitle.trim();
-
             let unique = false;
+
             foldersData.map((item) => {
               if (item.title === newFolder) {
                 AlertIOS.alert('Please choose a different folder name');
@@ -123,9 +164,8 @@ export default class FolderComponent extends React.Component {
   handleCreateFolder(newFolderTitle) {
     // Remove spaces from string
     const newFolder = newFolderTitle.trim();
-
-    let unique = false;
     const { foldersData } = this.state;
+    let unique = false;
 
     foldersData.map((folder) => {
       if (folder.title === newFolder) {
@@ -142,33 +182,38 @@ export default class FolderComponent extends React.Component {
   }
 
   render() {
-    const { foldersData } = this.state;
+    const { foldersData, colorMode, sortBy } = this.state;
     const { navigation } = this.props;
 
     return (
-      <View style={style.folderContainer}>
+      <View style={[defaultStyle.component, colorMode ? themeStyle.backgroundDark : themeStyle.backgroundWhite]}>
+        <StatusBar barStyle={colorMode ? 'light-content' : 'dark-content'} />
         {/* Flat List View */}
         <SwipeListView
           useFlatList
-          style={style.container}
+          style={[style.container, colorMode ? themeStyle.backgroundDark : themeStyle.backgroundWhite]}
           data={foldersData}
           renderItem={rowData => (
-            <TouchableHighlight onPress={() => navigation.navigate('NoteComponent', { parentFolder: rowData.item })} style={style.row} underlayColor="#ECECED">
-              <View style={style.rowContainer}>
+            <TouchableHighlight
+              onPress={() => navigation.navigate('NoteComponent', { parentFolder: rowData.item, colorMode, sortBy })}
+              style={[style.row, colorMode ? themeStyle.backgroundDark : themeStyle.backgroundWhite]}
+              underlayColor={colorMode ? '#22354C' : '#ECECED'}
+            >
+              <View style={[style.rowContainer, colorMode ? themeStyle.darkBorder : themeStyle.grayBorder]}>
                 <View style={style.rowView}>
-                  <Text ellipsizeMode="tail" numberOfLines={1} style={style.rowTitle}>
+                  <Text ellipsizeMode="tail" numberOfLines={1} style={[style.rowTitle, colorMode ? themeStyle.white : themeStyle.gray]}>
                     {rowData.item.title}
                   </Text>
-                  <Text style={style.rowSubtitle}>{rowData.item.updatedAt}</Text>
+                  <Text style={style.rowSubtitle}>{Moment(rowData.item.updatedAt).calendar()}</Text>
                 </View>
-                <View style={style.rowIcon}>
-                  <Image style={style.rowIconImage} source={forwardIcon} />
+                <View style={defaultStyle.rowIcon}>
+                  <Image style={defaultStyle.rowIconImage} source={forwardIcon} />
                 </View>
               </View>
             </TouchableHighlight>
           )}
           renderHiddenItem={(rowData, rowMap) => (
-            <View style={style.rowBack}>
+            <View style={[style.rowBack, colorMode ? themeStyle.backgroundDark : themeStyle.backgroundWhite]}>
               <TouchableOpacity
                 style={[style.backRightBtn, style.backRightBtnLeft]}
                 onPress={_ => this.handleUpdateFolder(rowData.item, rowData.item.id, rowMap)}

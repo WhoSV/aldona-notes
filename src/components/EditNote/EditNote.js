@@ -4,11 +4,13 @@ import {
   View, TextInput, ScrollView, Keyboard, Dimensions, TouchableOpacity, Text, Share, Image,
 } from 'react-native';
 
-// Import database
+// Import Database
 import { database } from '../../database/Database';
 
-// Import styles
+// Import Styles
 import style from './style';
+import themeStyle from '../shared/colorStyle';
+import defaultHeaderStyle from '../shared/defaultHeaderStyle';
 
 // Import Icons
 const shareIcon = require('../../assets/images/share.png');
@@ -17,8 +19,12 @@ export default class EditNoteComponent extends React.Component {
   // Header Component
   static navigationOptions = ({ navigation }) => {
     const { params = {} } = navigation.state;
+
     return {
-      headerStyle: style.editNoteHeaderStyle,
+      headerStyle: [
+        defaultHeaderStyle.header,
+        params.colorMode ? [themeStyle.backgroundSoftDark, themeStyle.darkBorder] : [themeStyle.backgroundWhite, themeStyle.lightBorder],
+      ],
       headerTintColor: '#18C4E6',
       headerRight: params.action,
       headerTruncatedBackTitle: 'Back',
@@ -27,10 +33,11 @@ export default class EditNoteComponent extends React.Component {
 
   constructor(props) {
     super(props);
-
     const { navigation } = this.props;
+
     this.state = {
       noteToUpdate: navigation.getParam('note', 'empty-note'),
+      colorMode: navigation.getParam('colorMode', 'no-mode'),
       text: '',
       visibleHeight: 230,
     };
@@ -41,6 +48,7 @@ export default class EditNoteComponent extends React.Component {
 
   componentWillMount() {
     const { noteToUpdate } = this.state;
+
     this.setState({
       text: noteToUpdate.text,
     });
@@ -74,16 +82,22 @@ export default class EditNoteComponent extends React.Component {
 
     this.handleEditNote();
 
+    let shareButtonColor = '#18C4E6';
+    if (!text) {
+      shareButtonColor = '#ccc';
+    }
+
     navigation.setParams({
       action: (
         <TouchableOpacity
+          disabled={!text}
           onPress={() => Share.share({
             message: text,
           })
           }
           style={style.actionButtons}
         >
-          <Image style={style.shareButtonText} source={shareIcon} />
+          <Image style={[style.shareButtonText, { tintColor: shareButtonColor }]} source={shareIcon} />
         </TouchableOpacity>
       ),
     });
@@ -104,11 +118,11 @@ export default class EditNoteComponent extends React.Component {
   }
 
   render() {
-    const { text, visibleHeight } = this.state;
+    const { text, visibleHeight, colorMode } = this.state;
 
     return (
-      <View style={style.editNoteContainer}>
-        <ScrollView keyboardDismissMode="interactive">
+      <View style={[style.editNoteContainer, colorMode ? themeStyle.backgroundDark : themeStyle.backgroundWhite]}>
+        <ScrollView keyboardDismissMode="on-drag">
           <TextInput
             value={text}
             onChangeText={newText => this.setState({ text: newText })}
@@ -116,7 +130,7 @@ export default class EditNoteComponent extends React.Component {
               height: visibleHeight - 20,
               paddingRight: 15,
               fontSize: 18,
-              color: '#4A4A4A',
+              color: colorMode ? '#ffffff' : '#4A4A4A',
             }}
             textAlignVertical="top"
             multiline

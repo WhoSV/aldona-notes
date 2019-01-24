@@ -8,6 +8,7 @@ export default class DatabaseInitialization {
     // First: create tables if they do not already exist
     return database
       .transaction(this.createTables)
+      .then(() => this.createConfigs(database))
       .then(() => this.getDatabaseVersion(database))
       .then((version) => {
         dbVersion = version;
@@ -35,6 +36,7 @@ export default class DatabaseInitialization {
     if (dropAllTables) {
       transaction.executeSql('DROP TABLE IF EXISTS Folder;');
       transaction.executeSql('DROP TABLE IF EXISTS Note;');
+      transaction.executeSql('DROP TABLE IF EXISTS Config');
       transaction.executeSql('DROP TABLE IF EXISTS Version;');
     }
 
@@ -46,6 +48,9 @@ export default class DatabaseInitialization {
       'CREATE TABLE IF NOT EXISTS Note( id INTEGER PRIMARY KEY NOT NULL, '
         + 'folder_id INTEGER, text TEXT, updated_at TEXT, FOREIGN KEY ( folder_id ) REFERENCES Folder ( id ));',
     );
+
+    // Configs table
+    transaction.executeSql('CREATE TABLE IF NOT EXISTS Config( id INTEGER PRIMARY KEY NOT NULL, title TEXT, data TEXT);');
 
     // Version table
     transaction.executeSql('CREATE TABLE IF NOT EXISTS Version( version_id INTEGER PRIMARY KEY NOT NULL, version INTEGER);');
@@ -65,6 +70,34 @@ export default class DatabaseInitialization {
       console.log(`No version set. Returning 0. Details: ${error}`);
       return 0;
     });
+
+  // Create config data if not exists
+  createConfigs = database => database.executeSql('SELECT * FROM Config').then(([results]) => {
+    if (results.rows.length <= 0) {
+      database
+        .executeSql('INSERT INTO Config (id, title, data) VALUES (?, ?, ?);', [
+          1,
+          'The App',
+          '[{"id": 1, "type": "switch", "name": "Dark Mode", "status": false,"image": "darkIcon"}]',
+        ])
+        .then(() => {
+          console.log('[db] Added The App Config');
+        });
+      database
+        .executeSql('INSERT INTO Config (id, title, data) VALUES (?, ?, ?);', [
+          2,
+          'Viewing',
+          '[{"id": 1, "type": "multiple", "name": "Sort Notes By", "value": { "id": 1, "text": "Date created", "order": "id DESC"},'
+              + ' "image": "sortIcon", "values": [{"id": 1, "text": "Date created", "order": "id DESC"}, {"id": 2, "text": "Date edited",'
+              + ' "order": "updatedAt DESC"}, {"id": 3, "text": "Title", "order": "text ASC"}]}]',
+        ])
+        .then(() => {
+          console.log('[db] Added Viewing Config');
+        });
+    } else {
+      console.log('We have configs');
+    }
+  });
 
   // Once the app has shipped, use the following functions as a template for updating the database:
   /*

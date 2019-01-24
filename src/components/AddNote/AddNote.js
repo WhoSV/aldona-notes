@@ -5,11 +5,13 @@ import {
 } from 'react-native';
 import { NavigationActions } from 'react-navigation';
 
-// Import database
+// Import Database
 import { database } from '../../database/Database';
 
-// Import styles
+// Import Styles
 import style from './style';
+import themeStyle from '../shared/colorStyle';
+import defaultHeaderStyle from '../shared/defaultHeaderStyle';
 
 // Import Icons
 const backIcon = require('../../assets/images/back.png');
@@ -22,8 +24,12 @@ export default class AddNoteComponent extends React.Component {
   // Header Component
   static navigationOptions = ({ navigation }) => {
     const { params = {} } = navigation.state;
+
     return {
-      headerStyle: style.addNoteHeaderStyle,
+      headerStyle: [
+        defaultHeaderStyle.header,
+        params.colorMode ? [themeStyle.backgroundSoftDark, themeStyle.darkBorder] : [themeStyle.backgroundWhite, themeStyle.lightBorder],
+      ],
       headerTintColor: '#18C4E6',
       headerRight: params.action,
       headerLeft: (
@@ -43,10 +49,11 @@ export default class AddNoteComponent extends React.Component {
 
   constructor(props) {
     super(props);
-
     const { navigation } = this.props;
+
     this.state = {
       parentFolder: navigation.getParam('parentFolder', 'empty-folder'),
+      colorMode: navigation.getParam('colorMode', 'no-mode'),
       text: '',
       visibleHeight: 230,
     };
@@ -93,16 +100,22 @@ export default class AddNoteComponent extends React.Component {
     const { text } = this.state;
     const { navigation } = this.props;
 
+    let shareButtonColor = '#18C4E6';
+    if (!text) {
+      shareButtonColor = '#ccc';
+    }
+
     navigation.setParams({
       action: (
         <TouchableOpacity
+          disabled={!text}
           onPress={() => Share.share({
             message: text,
           })
           }
           style={style.actionButtons}
         >
-          <Image style={style.shareButtonText} source={shareIcon} />
+          <Image style={[style.shareButtonText, { tintColor: shareButtonColor }]} source={shareIcon} />
         </TouchableOpacity>
       ),
     });
@@ -124,18 +137,18 @@ export default class AddNoteComponent extends React.Component {
   }
 
   render() {
-    const { visibleHeight } = this.state;
+    const { visibleHeight, colorMode } = this.state;
 
     return (
-      <View style={style.addNoteContainer}>
-        <ScrollView keyboardDismissMode="interactive">
+      <View style={[style.addNoteContainer, colorMode ? themeStyle.backgroundDark : themeStyle.backgroundWhite]}>
+        <ScrollView keyboardDismissMode="on-drag">
           <TextInput
             onChangeText={text => this.setState({ text })}
             style={{
               height: visibleHeight - 20,
               paddingRight: 15,
               fontSize: 18,
-              color: '#4A4A4A',
+              color: colorMode ? '#ffffff' : '#4A4A4A',
             }}
             textAlignVertical="top"
             multiline

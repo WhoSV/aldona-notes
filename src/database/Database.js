@@ -42,20 +42,24 @@ export class Database {
   }
 
   createFolder(newFolderTitle) {
+    const newFolder = newFolderTitle.charAt(0).toUpperCase() + newFolderTitle.slice(1);
+
     return this.getDatabase()
-      .then(db => db.executeSql('INSERT INTO Folder (title, updated_at) VALUES (?, ?);', [newFolderTitle, Moment(new Date()).calendar()]))
+      .then(db => db.executeSql('INSERT INTO Folder (title, updated_at) VALUES (?, ?);', [newFolder, Moment().format()]))
       .then(([results]) => {
         const { insertId } = results;
-        console.log(`[db] Added folder with title: "${newFolderTitle}"! InsertId: ${insertId}`);
+        console.log(`[db] Added folder with title: "${newFolder}"! InsertId: ${insertId}`);
       });
   }
 
   updateFolder(folder, newFolderTitle) {
+    const newFolder = newFolderTitle.charAt(0).toUpperCase() + newFolderTitle.slice(1);
+
     console.log(`[db] Updating folder: "${folder.title}" with id: ${folder.id}`);
     return this.getDatabase()
-      .then(db => db.executeSql('UPDATE Folder set title = ?, updated_at = ? where id = ?;', [newFolderTitle, Moment(new Date()).calendar(), folder.id]))
+      .then(db => db.executeSql('UPDATE Folder set title = ?, updated_at = ? where id = ?;', [newFolder, Moment().format(), folder.id]))
       .then(() => {
-        console.log(`[db] Updated folder with title: "${folder.title}"! Now new title: ${newFolderTitle}`);
+        console.log(`[db] Updated folder with title: "${folder.title}"! Now new title: ${newFolder}`);
       });
   }
 
@@ -118,7 +122,7 @@ export class Database {
       return Promise.reject(new Error('Could not add note to undefined folder.'));
     }
     return this.getDatabase()
-      .then(db => db.executeSql('INSERT INTO Note (text, updated_at, folder_id) VALUES (?, ?, ?);', [text, Moment(new Date()).calendar(), folder.id]))
+      .then(db => db.executeSql('INSERT INTO Note (text, updated_at, folder_id) VALUES (?, ?, ?);', [text, Moment().format(), folder.id]))
       .then(([results]) => {
         const { insertId } = results;
         console.log(`[db] Note with "${text}" created successfully with id: ${insertId}`);
@@ -131,18 +135,21 @@ export class Database {
 
     console.log(`[db] Updating note: "${note.text}" with id: ${note.id}`);
     return this.getDatabase()
-      .then(db => db.executeSql('UPDATE Note set text = ?, updated_at = ? where id = ?;', [text, Moment(new Date()).calendar(), note.id]))
+      .then(db => db.executeSql('UPDATE Note set text = ?, updated_at = ? where id = ?;', [text, Moment().format(), note.id]))
       .then(() => {
         console.log(`[db] Updated note with text: "${note.text}"! Now new text: ${text}`);
       });
   }
 
-  getNotesByFolderId(folder) {
+  getNotesByFolderId(folder, sortBy) {
     if (folder === undefined) {
       return Promise.resolve([]);
     }
+
+    const sort = sortBy || 'id DESC';
+
     return this.getDatabase()
-      .then(db => db.executeSql('SELECT id, text, updated_at as updatedAt, folder_id as folderId FROM Note WHERE folder_id = ? ORDER BY updated_at DESC;', [folder.id]))
+      .then(db => db.executeSql(`SELECT id, text, updated_at as updatedAt, folder_id as folderId FROM Note WHERE folder_id = ? ORDER BY ${sort};`, [folder.id]))
       .then(([results]) => {
         if (results === undefined) {
           return [];
@@ -173,6 +180,38 @@ export class Database {
       .then(db => db.executeSql('DELETE FROM Note WHERE id = ?;', [note.id]).then(() => db))
       .then(() => {
         console.log(`[db] Deleted note titled: "${note.text}"!`);
+      });
+  }
+
+  getConfigs() {
+    console.log('[db] Fetching configs from the db...');
+    return this.getDatabase()
+      .then(db => db.executeSql('SELECT title, id, data FROM Config;'))
+      .then(([results]) => {
+        if (results === undefined) {
+          return [];
+        }
+        const count = results.rows.length;
+        const configs = [];
+        for (let i = 0; i < count; i += 1) {
+          const row = results.rows.item(i);
+          const { title, id } = row;
+          const data = JSON.parse(row.data);
+          console.log(`[db] Config title: ${title}, id: ${id}`);
+          configs.push({ id, title, data });
+        }
+        return configs;
+      });
+  }
+
+  updateConfig(section, newConfigData) {
+    console.log(`[db] Updating configs: "${newConfigData.name}"`);
+    // Attach new config in []
+    const config = `[${JSON.stringify(newConfigData)}]`;
+    return this.getDatabase()
+      .then(db => db.executeSql('UPDATE Config set data = ? where id = ?;', [config, section.id]))
+      .then(() => {
+        console.log(`[db] Updated config with title: "${newConfigData.name}"!`);
       });
   }
 

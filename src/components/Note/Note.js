@@ -4,12 +4,16 @@ import {
   View, Text, TouchableHighlight, TouchableOpacity, Share, Image,
 } from 'react-native';
 import { SwipeListView } from 'react-native-swipe-list-view';
+import Moment from 'moment';
 
-// Import database
+// Import Database
 import { database } from '../../database/Database';
 
-// Import styles
+// Import Styles
 import style from './style';
+import themeStyle from '../shared/colorStyle';
+import defaultStyle from '../shared/defaultStyle';
+import defaultHeaderStyle from '../shared/defaultHeaderStyle';
 
 // Import Icons
 const forwardIcon = require('../../assets/images/forward.png');
@@ -21,26 +25,31 @@ export default class NoteComponent extends React.Component {
   // Header Component
   static navigationOptions = ({ navigation }) => {
     const { params } = navigation.state;
+
     return {
       title: params ? params.parentFolder.title : 'Notes',
-      headerStyle: style.noteHeaderStyle,
+      headerStyle: [
+        defaultHeaderStyle.header,
+        params.colorMode ? [themeStyle.backgroundSoftDark, themeStyle.darkBorder] : [themeStyle.backgroundWhite, themeStyle.lightBorder],
+      ],
       headerTintColor: '#18C4E6',
-      headerTitleStyle: style.noteHeaderTitleStyle,
+      headerTitleStyle: [defaultHeaderStyle.headerTitle, params.colorMode ? themeStyle.white : themeStyle.light],
     };
   };
 
   constructor(props) {
     super(props);
-
     const { navigation } = this.props;
 
     this.state = {
       notesData: [],
       parentFolder: navigation.getParam('parentFolder', 'empty-folder'),
+      colorMode: navigation.getParam('colorMode', 'no-mode'),
+      sortBy: navigation.getParam('sortBy', 'no-sort'),
     };
   }
 
-  componentDidMount() {
+  componentWillMount() {
     this.refreshNoteList();
   }
 
@@ -54,8 +63,8 @@ export default class NoteComponent extends React.Component {
   };
 
   refreshNoteList() {
-    const { parentFolder } = this.state;
-    return database.getNotesByFolderId(parentFolder).then(notesData => this.setState({ notesData }));
+    const { parentFolder, sortBy } = this.state;
+    return database.getNotesByFolderId(parentFolder, sortBy).then(notesData => this.setState({ notesData }));
   }
 
   handleDeleteNote(note, rowKey, rowMap) {
@@ -66,37 +75,37 @@ export default class NoteComponent extends React.Component {
   }
 
   render() {
-    const { notesData, parentFolder } = this.state;
+    const { notesData, parentFolder, colorMode } = this.state;
     const { navigation } = this.props;
 
     return (
-      <View style={style.noteContainer}>
+      <View style={[defaultStyle.component, colorMode ? themeStyle.backgroundDark : themeStyle.backgroundWhite]}>
         {/* Flat List View */}
         <SwipeListView
           useFlatList
-          style={style.container}
+          style={[style.container, colorMode ? themeStyle.backgroundDark : themeStyle.backgroundWhite]}
           data={notesData}
           renderItem={rowData => (
             <TouchableHighlight
-              onPress={() => navigation.navigate('EditNoteComponent', { note: rowData.item, refreshNoteList: this.refreshNoteList.bind(this) })}
-              style={style.row}
-              underlayColor="#ECECED"
+              onPress={() => navigation.navigate('EditNoteComponent', { note: rowData.item, refreshNoteList: this.refreshNoteList.bind(this), colorMode })}
+              style={[style.row, colorMode ? themeStyle.backgroundDark : themeStyle.backgroundWhite]}
+              underlayColor={colorMode ? '#22354C' : '#ECECED'}
             >
-              <View style={style.rowContainer}>
+              <View style={[style.rowContainer, colorMode ? themeStyle.darkBorder : themeStyle.grayBorder]}>
                 <View style={style.rowView}>
-                  <Text ellipsizeMode="tail" numberOfLines={1} style={style.rowTitle}>
+                  <Text ellipsizeMode="tail" numberOfLines={1} style={[style.rowTitle, colorMode ? themeStyle.white : themeStyle.gray]}>
                     {rowData.item.text}
                   </Text>
-                  <Text style={style.rowSubtitle}>{rowData.item.updatedAt}</Text>
+                  <Text style={style.rowSubtitle}>{Moment(rowData.item.updatedAt).calendar()}</Text>
                 </View>
-                <View style={style.rowIcon}>
-                  <Image style={style.rowIconImage} source={forwardIcon} />
+                <View style={defaultStyle.rowIcon}>
+                  <Image style={defaultStyle.rowIconImage} source={forwardIcon} />
                 </View>
               </View>
             </TouchableHighlight>
           )}
           renderHiddenItem={(rowData, rowMap) => (
-            <View style={style.rowBack}>
+            <View style={[style.rowBack, colorMode ? themeStyle.backgroundDark : themeStyle.backgroundWhite]}>
               <TouchableOpacity style={[style.backRightBtn, style.backRightBtnLeft]} onPress={_ => this.handleShareNote(rowData.item, rowData.item.id, rowMap)}>
                 <Image style={style.backShareIcon} source={shareIcon} />
               </TouchableOpacity>
@@ -118,7 +127,7 @@ export default class NoteComponent extends React.Component {
         <View style={style.addButtonView}>
           <TouchableOpacity
             style={style.addButton}
-            onPress={() => navigation.navigate('AddNoteComponent', { parentFolder, refreshNoteList: this.refreshNoteList.bind(this) })}
+            onPress={() => navigation.navigate('AddNoteComponent', { parentFolder, refreshNoteList: this.refreshNoteList.bind(this), colorMode })}
           >
             <Image style={style.addButtonImage} source={addIcon} />
           </TouchableOpacity>

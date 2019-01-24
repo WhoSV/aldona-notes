@@ -2,20 +2,9 @@ import { StyleSheet } from 'react-native';
 
 export default StyleSheet.create({
   // Header style
-  folderHeaderStyle: {
-    borderBottomWidth: 0,
-    height: 50,
-    marginBottom: -20,
-  },
-
-  folderHeaderTitleStyle: {
-    fontWeight: '300',
-    fontSize: 25,
-    color: '#18C4E6',
-  },
-
   folderHeaderSettingsButtonImage: {
     width: 25,
+    height: 25,
     overflow: 'hidden',
     marginLeft: 9,
     marginRight: 6,
@@ -25,34 +14,26 @@ export default StyleSheet.create({
   },
 
   // Component style
-  folderContainer: {
-    backgroundColor: 'white',
-    flex: 1,
-  },
-
   container: {
     marginTop: 20,
     borderTopWidth: 0,
-    backgroundColor: '#fff',
   },
 
   row: {
-    backgroundColor: '#ffffff',
-    paddingBottom: 10,
     paddingTop: 10,
     paddingLeft: 20,
-    paddingRight: 7,
-    borderBottomColor: '#ECECED',
-    borderBottomWidth: 1,
   },
 
   rowContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    paddingBottom: 10,
+    borderBottomWidth: 1,
   },
 
   rowView: {
-    width: '92%',
+    flex: 1,
+    justifyContent: 'space-between',
   },
 
   rowTitle: {
@@ -68,18 +49,8 @@ export default StyleSheet.create({
     fontSize: 14,
   },
 
-  rowIcon: {
-    justifyContent: 'center',
-  },
-
-  rowIconImage: {
-    width: 18,
-    height: 18,
-  },
-
   rowBack: {
     alignItems: 'center',
-    backgroundColor: '#fff',
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',

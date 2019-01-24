@@ -7,6 +7,7 @@ import NoteComponent from './Note/Note';
 import AddNoteComponent from './AddNote/AddNote';
 import EditNoteComponent from './EditNote/EditNote';
 import SettingsComponent from './Settings/Settings';
+import SingleSelectList from './Settings/SingleSelectList/SingleSelectList';
 
 const handleCustomTransition = ({ scenes }) => {
   const prevScene = scenes[scenes.length - 2];
@@ -52,8 +53,10 @@ const AppNavigator = createStackNavigator(
     AddNoteComponent: { screen: AddNoteComponent },
     EditNoteComponent: { screen: EditNoteComponent },
     SettingsComponent: { screen: SettingsComponent },
+    SingleSelectList: { screen: SingleSelectList },
   },
   {
+    headerMode: 'screen',
     transitionConfig: nav => handleCustomTransition(nav),
   },
 );

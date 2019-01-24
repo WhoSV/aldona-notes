@@ -1,48 +1,27 @@
 import { StyleSheet } from 'react-native';
 
 export default StyleSheet.create({
-  // Header style
-  noteHeaderStyle: {
-    borderBottomWidth: 0,
-    height: 50,
-    marginBottom: -20,
-  },
-
-  noteHeaderTitleStyle: {
-    fontWeight: '300',
-    fontSize: 25,
-    color: '#18C4E6',
-  },
-
   // Component style
-  noteContainer: {
-    backgroundColor: 'white',
-    flex: 1,
-  },
-
   container: {
     marginTop: 20,
     borderTopWidth: 0,
-    backgroundColor: '#fff',
   },
 
   row: {
-    backgroundColor: '#ffffff',
-    paddingBottom: 10,
     paddingTop: 10,
     paddingLeft: 20,
-    paddingRight: 7,
-    borderBottomColor: '#ECECED',
-    borderBottomWidth: 1,
   },
 
   rowContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    paddingBottom: 10,
+    borderBottomWidth: 1,
   },
 
   rowView: {
-    width: '92%',
+    flex: 1,
+    justifyContent: 'space-between',
   },
 
   rowTitle: {
@@ -58,18 +37,8 @@ export default StyleSheet.create({
     fontSize: 14,
   },
 
-  rowIcon: {
-    justifyContent: 'center',
-  },
-
-  rowIconImage: {
-    width: 18,
-    height: 18,
-  },
-
   rowBack: {
     alignItems: 'center',
-    backgroundColor: '#fff',
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -101,8 +70,8 @@ export default StyleSheet.create({
   },
 
   backDeleteIcon: {
-    width: 25,
-    height: 25,
+    width: 30,
+    height: 30,
   },
 
   addButtonView: {
