@@ -27,7 +27,3 @@ $ react-native run-android
 ### Running on device
 
 [Read React-Native Docs](https://facebook.github.io/react-native/docs/running-on-device)
-
-### Deploy
-
-// TODO
