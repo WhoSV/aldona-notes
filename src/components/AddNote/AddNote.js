@@ -10,8 +10,8 @@ import { database } from '../../database/Database';
 
 // Import Styles
 import style from './style';
-import themeStyle from '../shared/colorStyle';
-import defaultHeaderStyle from '../shared/defaultHeaderStyle';
+import themeStyle from '../shared/styles/colorStyle';
+import defaultHeaderStyle from '../shared/styles/defaultHeaderStyle';
 
 // Import Icons
 const backIcon = require('../../assets/images/back.png');

@@ -11,9 +11,9 @@ import { database } from '../../database/Database';
 
 // Import Styles
 import style from './style';
-import themeStyle from '../shared/colorStyle';
-import defaultStyle from '../shared/defaultStyle';
-import defaultHeaderStyle from '../shared/defaultHeaderStyle';
+import themeStyle from '../shared/styles/colorStyle';
+import defaultStyle from '../shared/styles/defaultStyle';
+import defaultHeaderStyle from '../shared/styles/defaultHeaderStyle';
 
 // Import Icons
 const forwardIcon = require('../../assets/images/forward.png');
@@ -67,6 +67,13 @@ export default class NoteComponent extends React.Component {
     return database.getNotesByFolderId(parentFolder, sortBy).then(notesData => this.setState({ notesData }));
   }
 
+  handleRowOpen(rowKey, rowMap) {
+    this.setState({
+      rowKeyOpened: rowKey,
+      rowMapOpened: rowMap,
+    });
+  }
+
   handleDeleteNote(note, rowKey, rowMap) {
     // Close row on touch button
     rowMap[rowKey] && rowMap[rowKey].closeRow();
@@ -75,7 +82,9 @@ export default class NoteComponent extends React.Component {
   }
 
   render() {
-    const { notesData, parentFolder, colorMode } = this.state;
+    const {
+      notesData, parentFolder, colorMode, rowMapOpened, rowKeyOpened,
+    } = this.state;
     const { navigation } = this.props;
 
     return (
@@ -104,6 +113,7 @@ export default class NoteComponent extends React.Component {
               </View>
             </TouchableHighlight>
           )}
+          onRowOpen={(rowData, rowMap) => this.handleRowOpen(rowData, rowMap)}
           renderHiddenItem={(rowData, rowMap) => (
             <View style={[style.rowBack, colorMode ? themeStyle.backgroundDark : themeStyle.backgroundWhite]}>
               <TouchableOpacity style={[style.backRightBtn, style.backRightBtnLeft]} onPress={_ => this.handleShareNote(rowData.item, rowData.item.id, rowMap)}>
@@ -127,7 +137,10 @@ export default class NoteComponent extends React.Component {
         <View style={style.addButtonView}>
           <TouchableOpacity
             style={style.addButton}
-            onPress={() => navigation.navigate('AddNoteComponent', { parentFolder, refreshNoteList: this.refreshNoteList.bind(this), colorMode })}
+            onPress={() => {
+              rowMapOpened && rowMapOpened[rowKeyOpened].closeRow(); // close row
+              navigation.navigate('AddNoteComponent', { parentFolder, refreshNoteList: this.refreshNoteList.bind(this), colorMode });
+            }}
           >
             <Image style={style.addButtonImage} source={addIcon} />
           </TouchableOpacity>
