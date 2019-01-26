@@ -63,7 +63,6 @@ export default StyleSheet.create({
 
   rowContentName: {
     fontSize: 16,
-    fontWeight: '500',
   },
 
   rowContentValue: {
