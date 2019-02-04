@@ -8,8 +8,8 @@ export default StyleSheet.create({
   },
 
   addNoteHeaderBackButtonImage: {
-    width: 13,
-    height: 21,
+    width: 20,
+    height: 20,
     overflow: 'hidden',
     marginLeft: 9,
     marginRight: 6,
@@ -39,9 +39,43 @@ export default StyleSheet.create({
   },
 
   // Component style
-  addNoteContainer: {
+  addNoteView: {
     flex: 1,
     paddingTop: 20,
+    backgroundColor: '#fff',
+    flexDirection: 'column',
+    justifyContent: 'flex-end',
+  },
+
+  addNoteContainer: {
+    flex: 1,
+    alignItems: 'stretch',
+  },
+
+  addNoteEditor: {
+    backgroundColor: '#fff',
     paddingLeft: 15,
+    paddingRight: 15,
+  },
+
+  imageOptionsContainerStyle: {
+    marginLeft: 20,
+    marginRight: 20,
+    backgroundColor: 'transparent',
+  },
+
+  imageMenuOptionStyle: {
+    borderRadius: 10,
+    marginBottom: 5,
+    backgroundColor: '#fff',
+  },
+
+  imageMenuOptionText: {
+    textAlign: 'center',
+    color: '#18C4E6',
+    fontSize: 18,
+    margin: 5,
+    paddingTop: 5,
+    paddingBottom: 5,
   },
 });

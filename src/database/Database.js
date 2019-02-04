@@ -116,16 +116,16 @@ export class Database {
 
   createNote(newText, folder) {
     // Remove spaces from string
-    const text = newText.trim();
+    // const text = newText.trim();
 
     if (folder === undefined) {
       return Promise.reject(new Error('Could not add note to undefined folder.'));
     }
     return this.getDatabase()
-      .then(db => db.executeSql('INSERT INTO Note (text, updated_at, folder_id) VALUES (?, ?, ?);', [text, Moment().format(), folder.id]))
+      .then(db => db.executeSql('INSERT INTO Note (text, updated_at, folder_id) VALUES (?, ?, ?);', [newText, Moment().format(), folder.id]))
       .then(([results]) => {
         const { insertId } = results;
-        console.log(`[db] Note with "${text}" created successfully with id: ${insertId}`);
+        console.log(`[db] Note with "${newText}" created successfully with id: ${insertId}`);
       });
   }
 
