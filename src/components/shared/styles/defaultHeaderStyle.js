@@ -9,6 +9,6 @@ export default StyleSheet.create({
 
   headerTitle: {
     fontWeight: '300',
-    fontSize: 25,
+    fontSize: 22,
   },
 });

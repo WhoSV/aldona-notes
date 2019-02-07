@@ -18,6 +18,7 @@ export default StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingBottom: 10,
+    paddingRight: 5,
     borderBottomWidth: 1,
   },
 

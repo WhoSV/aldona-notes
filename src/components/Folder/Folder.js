@@ -11,9 +11,9 @@ import { database } from '../../database/Database';
 
 // Import Styles
 import style from './style';
-import themeStyle from '../shared/colorStyle';
-import defaultStyle from '../shared/defaultStyle';
-import defaultHeaderStyle from '../shared/defaultHeaderStyle';
+import themeStyle from '../shared/styles/colorStyle';
+import defaultStyle from '../shared/styles/defaultStyle';
+import defaultHeaderStyle from '../shared/styles/defaultHeaderStyle';
 
 // Import Icons
 const forwardIcon = require('../../assets/images/forward.png');
@@ -161,6 +161,13 @@ export default class FolderComponent extends React.Component {
     );
   }
 
+  handleRowOpen(rowKey, rowMap) {
+    this.setState({
+      rowKeyOpened: rowKey,
+      rowMapOpened: rowMap,
+    });
+  }
+
   handleCreateFolder(newFolderTitle) {
     // Remove spaces from string
     const newFolder = newFolderTitle.trim();
@@ -182,7 +189,9 @@ export default class FolderComponent extends React.Component {
   }
 
   render() {
-    const { foldersData, colorMode, sortBy } = this.state;
+    const {
+      foldersData, colorMode, sortBy, rowMapOpened, rowKeyOpened,
+    } = this.state;
     const { navigation } = this.props;
 
     return (
@@ -212,6 +221,7 @@ export default class FolderComponent extends React.Component {
               </View>
             </TouchableHighlight>
           )}
+          onRowOpen={(rowData, rowMap) => this.handleRowOpen(rowData, rowMap)}
           renderHiddenItem={(rowData, rowMap) => (
             <View style={[style.rowBack, colorMode ? themeStyle.backgroundDark : themeStyle.backgroundWhite]}>
               <TouchableOpacity
@@ -238,22 +248,24 @@ export default class FolderComponent extends React.Component {
         <View style={style.addFolderButtonView}>
           <TouchableOpacity
             style={style.addFolderButton}
-            onPress={() => AlertIOS.prompt(
-              'New Folder',
-              'Enter name for new folder.',
-              [
-                {
-                  text: 'Cancel',
-                  style: 'cancel',
-                },
-                {
-                  text: 'OK',
-                  onPress: newFolderName => this.handleCreateFolder(newFolderName),
-                },
-              ],
-              'plain-text',
-            )
-            }
+            onPress={() => {
+              rowMapOpened && rowMapOpened[rowKeyOpened].closeRow(); // close row func
+              AlertIOS.prompt(
+                'New Folder',
+                'Enter name for new folder.',
+                [
+                  {
+                    text: 'Cancel',
+                    style: 'cancel',
+                  },
+                  {
+                    text: 'OK',
+                    onPress: newFolderName => this.handleCreateFolder(newFolderName),
+                  },
+                ],
+                'plain-text',
+              );
+            }}
           >
             <Text style={style.addFolderButtonText}>New Folder</Text>
           </TouchableOpacity>

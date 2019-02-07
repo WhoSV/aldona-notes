@@ -9,9 +9,9 @@ import { database } from '../../../database/Database';
 
 // Import Styles
 import style from './style';
-import themeStyle from '../../shared/colorStyle';
-import defaultStyle from '../../shared/defaultStyle';
-import defaultHeaderStyle from '../../shared/defaultHeaderStyle';
+import themeStyle from '../../shared/styles/colorStyle';
+import defaultStyle from '../../shared/styles/defaultStyle';
+import defaultHeaderStyle from '../../shared/styles/defaultHeaderStyle';
 
 // Import Icons
 const checkedIcon = require('../../../assets/images/checked.png');
