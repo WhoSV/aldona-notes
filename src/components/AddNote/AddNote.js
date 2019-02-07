@@ -1,9 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {
-  View, TextInput, ScrollView, Keyboard, Dimensions, TouchableOpacity, Text, Share, Image,
+  View, Keyboard, TouchableOpacity, Text, Share, Image, StyleSheet, Platform,
 } from 'react-native';
 import { NavigationActions } from 'react-navigation';
+
+import KeyboardSpacer from 'react-native-keyboard-spacer';
+import { RichTextEditor, RichTextToolbar } from '../../RichTextEditor';
 
 // Import Database
 import { database } from '../../database/Database';
@@ -51,96 +54,120 @@ export default class AddNoteComponent extends React.Component {
     super(props);
     const { navigation } = this.props;
 
+    this.getHTML = this.getHTML.bind(this);
+    this.setFocusHandlers = this.setFocusHandlers.bind(this);
+
     this.state = {
       parentFolder: navigation.getParam('parentFolder', 'empty-folder'),
-      colorMode: navigation.getParam('colorMode', 'no-mode'),
+      // colorMode: navigation.getParam('colorMode', 'no-mode'),
       text: '',
-      visibleHeight: 230,
+      // visibleHeight: 230,
     };
 
-    this.keyboardWillShow = this.keyboardWillShow.bind(this);
-    this.keyboardWillHide = this.keyboardWillHide.bind(this);
+    // this.keyboardWillShow = this.keyboardWillShow.bind(this);
+    // this.keyboardWillHide = this.keyboardWillHide.bind(this);
   }
 
-  componentWillMount() {
-    this.keyboardWillShowListener = Keyboard.addListener('keyboardWillShow', this.keyboardWillShow);
-    this.keyboardWillHideListener = Keyboard.addListener('keyboardWillHide', this.keyboardWillHide);
-  }
+  // componentWillMount() {
+  //   this.keyboardWillShowListener = Keyboard.addListener('keyboardWillShow', this.keyboardWillShow);
+  //   this.keyboardWillHideListener = Keyboard.addListener('keyboardWillHide', this.keyboardWillHide);
+  // }
 
   componentDidMount() {
     addNoteThis = this;
   }
 
-  componentWillUnmount() {
-    this.keyboardWillShowListener.remove();
-    this.keyboardWillHideListener.remove();
+  // componentWillUnmount() {
+  //   this.keyboardWillShowListener.remove();
+  //   this.keyboardWillHideListener.remove();
+  // }
+
+  onEditorInitialized() {
+    this.setFocusHandlers();
+    this.getHTML();
   }
 
-  keyboardWillShow(e) {
-    const { navigation } = this.props;
+  async getHTML() {
+    const contentHtml = await this.richtext.getContentHtml();
+    console.log(contentHtml);
+  }
 
-    navigation.setParams({
-      action: (
-        <TouchableOpacity
-          onPress={() => {
-            Keyboard.dismiss();
-          }}
-          style={style.actionButtons}
-        >
-          <Text style={style.doneButtonText}>Done</Text>
-        </TouchableOpacity>
-      ),
+  setFocusHandlers() {
+    this.richtext.setTitleFocusHandler(() => {
+      // alert('title focus');
     });
-    this.setState({
-      visibleHeight: Dimensions.get('window').height - e.endCoordinates.height - 100,
+    this.richtext.setContentFocusHandler(() => {
+      // alert('content focus');
     });
   }
 
-  keyboardWillHide() {
-    const { text } = this.state;
-    const { navigation } = this.props;
+  // keyboardWillShow() {
+  //   const { navigation } = this.props;
 
-    let shareButtonColor = '#18C4E6';
-    if (!text) {
-      shareButtonColor = '#ccc';
-    }
+  //   navigation.setParams({
+  //     action: (
+  //       <TouchableOpacity
+  //         onPress={() => {
+  //           Keyboard.dismiss();
+  //           this.getHTML();
+  //         }}
+  //         style={style.actionButtons}
+  //       >
+  //         <Text style={style.doneButtonText}>Done</Text>
+  //       </TouchableOpacity>
+  //     ),
+  //   });
+  //   this.setState({
+  //     // visibleHeight: Dimensions.get('window').height - e.endCoordinates.height - 100,
+  //   });
+  // }
 
-    navigation.setParams({
-      action: (
-        <TouchableOpacity
-          disabled={!text}
-          onPress={() => Share.share({
-            message: text,
-          })
-          }
-          style={style.actionButtons}
-        >
-          <Image style={[style.shareButtonText, { tintColor: shareButtonColor }]} source={shareIcon} />
-        </TouchableOpacity>
-      ),
-    });
-    this.setState({
-      visibleHeight: Dimensions.get('window').height - 100,
-    });
-  }
+  // keyboardWillHide() {
+  //   const { text } = this.state;
+  //   const { navigation } = this.props;
+
+  //   let shareButtonColor = '#18C4E6';
+  //   if (!text) {
+  //     shareButtonColor = '#ccc';
+  //   }
+
+  //   navigation.setParams({
+  //     action: (
+  //       <TouchableOpacity
+  //         disabled={!text}
+  //         onPress={() => Share.share({
+  //           message: text,
+  //         })
+  //         }
+  //         style={style.actionButtons}
+  //       >
+  //         <Image style={[style.shareButtonText, { tintColor: shareButtonColor }]} source={shareIcon} />
+  //       </TouchableOpacity>
+  //     ),
+  //   });
+  //   this.setState({
+  //     // visibleHeight: Dimensions.get('window').height - 100,
+  //   });
+  // }
 
   // Save note func
-  handleAddNote() {
+  async handleAddNote() {
+    const contentHtml = await this.richtext.getContentHtml();
     const { text, parentFolder } = this.state;
     const { navigation } = this.props;
 
-    if (text === null || text === '') {
-      console.log('Empty note');
-    } else {
-      database.createNote(text, parentFolder).then(() => navigation.state.params.refreshNoteList());
-    }
+    // if (text === null || text === '') {
+    //   console.log('Empty note');
+    // } else {
+    database.createNote(contentHtml, parentFolder).then(() => navigation.state.params.refreshNoteList());
+    // }
   }
 
   render() {
-    const { visibleHeight, colorMode } = this.state;
+    // const { visibleHeight, colorMode } = this.state;
 
     return (
-      <View style={[style.addNoteContainer, colorMode ? themeStyle.backgroundDark : themeStyle.backgroundWhite]}>
+      /* <View style={[style.addNoteContainer, colorMode ? themeStyle.backgroundDark : themeStyle.backgroundWhite]}>
         <ScrollView keyboardDismissMode="on-drag">
           <TextInput
             onChangeText={text => this.setState({ text })}
@@ -155,6 +182,16 @@ export default class AddNoteComponent extends React.Component {
             autoFocus
           />
         </ScrollView>
+      </View> */
+      <View style={styles.container}>
+        <RichTextEditor
+          ref={r => (this.richtext = r)}
+          style={styles.richText}
+          initialContentHTML={'Hello <b>World</b> <p>this is a new paragraph</p> <p>this is another new paragraph</p>'}
+          editorInitializedCallback={() => this.onEditorInitialized()}
+        />
+        <RichTextToolbar style={styles.toolbar} getEditor={() => this.richtext} />
+        {Platform.OS === 'ios' && <KeyboardSpacer />}
       </View>
     );
   }
@@ -165,3 +202,21 @@ AddNoteComponent.propTypes = {
     navigate: PropTypes.func.isRequired,
   }).isRequired,
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    flexDirection: 'column',
+    backgroundColor: '#fff',
+    paddingTop: 40,
+  },
+  richText: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'transparent',
+  },
+  toolbar: {
+    backgroundColor: '#fff',
+    color: '#18C4E6',
+  },
+});
